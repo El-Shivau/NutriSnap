@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="app-container">
+    <div class="page-header fade-up">
+        <h1>Smart Feed</h1>
+        <span class="logo-text">NutriSnap</span>
+    </div>
+
+    <p class="text-muted fade-up fade-up-delay-1" style="margin-bottom: 20px; font-size: 0.9rem;">
+        Personalized meal suggestions based on your weekly nutrition analysis.
+    </p>
+
+    <div id="feed-list">
+        <div class="glass-card text-center" style="padding: 40px;">
+            <div class="spinner"></div>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Analyzing your nutrition...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const recs = await fetchAuth('/api/recommendations');
+            const list = document.getElementById('feed-list');
+            list.innerHTML = '';
+
+            if (!recs || recs.length === 0) {
+                list.innerHTML = `
+                    <div class="glass-card text-center" style="padding: 40px;">
+                        <div style="font-size: 2rem; margin-bottom: 12px;">🎉</div>
+                        <p class="text-muted">Your nutrition looks great! Keep it up.</p>
+                    </div>`;
+                return;
+            }
+
+            recs.forEach((rec, i) => {
+                const card = document.createElement('div');
+                card.className = `glass-card feed-card fade-up`;
+                card.style.animationDelay = `${i * 0.08}s`;
+                card.style.opacity = '0';
+                card.innerHTML = `
+                    <div class="feed-meal-name">${rec.meal_name}</div>
+                    <div class="feed-macros">
+                        <div class="feed-macro">🔥 <span>${rec.calories}</span> kcal</div>
+                        <div class="feed-macro">💪 <span>${rec.protein}g</span> protein</div>
+                        <div class="feed-macro">🍞 <span>${rec.carbs}g</span> carbs</div>
+                        <div class="feed-macro">🫒 <span>${rec.fat}g</span> fat</div>
+                    </div>
+                    <div class="feed-reason">${rec.reason_for_recommendation}</div>
+                `;
+                list.appendChild(card);
+            });
+        } catch (e) {
+            console.error('Error loading recommendations', e);
+            document.getElementById('feed-list').innerHTML =
+                '<div class="glass-card text-center" style="padding: 30px;"><p class="text-muted">Failed to load recommendations.</p></div>';
+        }
+    });
+</script>
+{% endblock %}

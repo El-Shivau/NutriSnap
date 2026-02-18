@@ -1,0 +1,437 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="app-container">
+    <div class="page-header fade-up">
+        <h1>Scan Food</h1>
+        <span class="logo-text">NutriSnap</span>
+    </div>
+
+    <!-- Tab Switcher -->
+    <div class="scan-tabs fade-up fade-up-delay-1">
+        <button class="scan-tab active" id="tab-upload" onclick="switchTab('upload')">
+            <i class="fas fa-cloud-upload-alt"></i> Upload
+        </button>
+        <button class="scan-tab" id="tab-camera" onclick="switchTab('camera')">
+            <i class="fas fa-camera"></i> Camera
+        </button>
+    </div>
+
+    <!-- Upload Mode -->
+    <div id="upload-mode" class="fade-up fade-up-delay-2">
+        <div class="glass-card">
+            <div class="drop-zone" id="drop-zone">
+                <div class="drop-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <p class="drop-zone-text">Tap or drag to upload image</p>
+                <input type="file" id="fileInput" accept="image/*"
+                    style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
+            </div>
+
+            <div id="preview-container" class="d-none" style="margin-top: 20px; text-align: center;">
+                <img id="preview-img" src="" style="max-width: 100%; border-radius: 12px; max-height: 260px;">
+                <div style="margin-top: 16px;">
+                    <button id="analyze-btn" class="btn btn-primary w-full">
+                        <i class="fas fa-search"></i> Analyze Image
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera Mode -->
+    <div id="camera-mode" class="d-none fade-up">
+        <div class="glass-card">
+            <div class="camera-container">
+                <video id="camera-video" autoplay playsinline></video>
+            </div>
+            <button class="capture-btn" id="capture-btn" title="Capture"></button>
+            <canvas id="camera-canvas" style="display: none;"></canvas>
+
+            <div id="camera-preview" class="d-none" style="margin-top: 16px; text-align: center;">
+                <img id="captured-img" src="" style="max-width: 100%; border-radius: 12px; max-height: 260px;">
+                <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center;">
+                    <button id="retake-btn" class="btn btn-ghost" onclick="retakePhoto()">
+                        <i class="fas fa-redo"></i> Retake
+                    </button>
+                    <button id="analyze-capture-btn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Analyze
+                    </button>
+                </div>
+            </div>
+
+            <div id="camera-error" class="d-none text-center" style="padding: 40px;">
+                <div style="font-size: 2rem; margin-bottom: 12px;">📷</div>
+                <p class="text-muted" id="camera-error-msg">Camera access denied. Please allow camera permissions.</p>
+                <button class="btn btn-outline mt-4" onclick="startCamera()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="d-none text-center" style="margin-top: 40px;">
+        <div class="spinner"></div>
+        <p class="text-muted mt-2">Analyzing your food...</p>
+    </div>
+
+    <!-- Result -->
+    <div id="result-container" class="d-none fade-up" style="margin-top: 20px;">
+        <div class="glass-card result-card" style="padding: 28px;">
+            <div class="result-name" id="res-name">Food Name</div>
+            <div class="result-cals">
+                <span id="res-cals" style="font-weight: 800;">0</span> kcal
+                <span id="res-serving" style="font-size: 0.75rem; color: var(--text-muted);"></span>
+            </div>
+            <div class="result-macros">
+                <div>
+                    <div class="macro-label">Protein</div>
+                    <div class="macro-value" id="res-protein" style="color: var(--blue);">0g</div>
+                </div>
+                <div>
+                    <div class="macro-label">Carbs</div>
+                    <div class="macro-value" id="res-carbs" style="color: var(--amber);">0g</div>
+                </div>
+                <div>
+                    <div class="macro-label">Fat</div>
+                    <div class="macro-value" id="res-fat" style="color: var(--red);">0g</div>
+                </div>
+            </div>
+            <!-- Extra macros row -->
+            <div class="result-macros" id="extra-macros" style="margin-top: 8px; display: none;">
+                <div>
+                    <div class="macro-label">Fiber</div>
+                    <div class="macro-value" id="res-fiber" style="color: var(--primary);">0g</div>
+                </div>
+                <div>
+                    <div class="macro-label">Sugar</div>
+                    <div class="macro-value" id="res-sugar" style="color: #e879f9;">0g</div>
+                </div>
+            </div>
+            <!-- Source badge -->
+            <div id="nutrition-source" style="margin-top: 10px; text-align: center; display: none;">
+                <span
+                    style="font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; background: rgba(34,197,94,0.15); color: var(--primary);"></span>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+            <button onclick="resetScan()" class="btn btn-ghost" style="flex:1;">
+                <i class="fas fa-redo"></i> Scan Again
+            </button>
+            <button id="add-to-log-btn" onclick="addToLog()" class="btn btn-primary" style="flex:1; display: none;">
+                <i class="fas fa-plus-circle"></i> Add to Log
+            </button>
+        </div>
+        <p id="log-hint" class="text-muted"
+            style="font-size: 0.8rem; margin-top: 8px; text-align: center; display: none;">
+            Tap "Add to Log" only if you ate this meal
+        </p>
+        <div id="log-success" class="text-muted"
+            style="font-size: 0.85rem; margin-top: 10px; text-align: center; color: var(--primary); display: none;">
+            <i class="fas fa-check-circle"></i> Added to your food log!
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // ── State ──────────────────────────────
+    let currentFile = null;
+    let cameraStream = null;
+    let currentMode = 'upload';
+    let lastScanResult = null;  // stores last prediction for explicit logging
+
+    // ── Elements ───────────────────────────
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImg = document.getElementById('preview-img');
+    const dropZone = document.getElementById('drop-zone');
+    const resultContainer = document.getElementById('result-container');
+    const loading = document.getElementById('loading');
+    const analyzeBtn = document.getElementById('analyze-btn');
+
+    const cameraVideo = document.getElementById('camera-video');
+    const cameraCanvas = document.getElementById('camera-canvas');
+    const captureBtn = document.getElementById('capture-btn');
+    const capturedImg = document.getElementById('captured-img');
+    const cameraPreview = document.getElementById('camera-preview');
+    const analyzeCaptureBtn = document.getElementById('analyze-capture-btn');
+    const cameraError = document.getElementById('camera-error');
+
+    // ── Tab Switching ──────────────────────
+    function switchTab(mode) {
+        currentMode = mode;
+        document.getElementById('tab-upload').classList.toggle('active', mode === 'upload');
+        document.getElementById('tab-camera').classList.toggle('active', mode === 'camera');
+        document.getElementById('upload-mode').classList.toggle('d-none', mode !== 'upload');
+        document.getElementById('camera-mode').classList.toggle('d-none', mode !== 'camera');
+
+        if (mode === 'camera') {
+            startCamera();
+        } else {
+            stopCamera();
+        }
+    }
+
+    // ── Upload Mode ────────────────────────
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            showPreview(e.target.files[0]);
+        }
+    });
+
+    function showPreview(file) {
+        currentFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            previewContainer.classList.remove('d-none');
+            dropZone.classList.add('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    analyzeBtn.addEventListener('click', () => {
+        if (!currentFile) return;
+        analyzeImage(currentFile);
+    });
+
+    // ── Camera Mode ────────────────────────
+    async function startCamera() {
+        cameraError.classList.add('d-none');
+        cameraPreview.classList.add('d-none');
+        cameraVideo.style.display = 'block';
+        captureBtn.style.display = 'block';
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+            });
+            cameraStream = stream;
+            cameraVideo.srcObject = stream;
+        } catch (err) {
+            console.error('Camera error:', err);
+            cameraVideo.style.display = 'none';
+            captureBtn.style.display = 'none';
+            cameraError.classList.remove('d-none');
+
+            if (err.name === 'NotAllowedError') {
+                document.getElementById('camera-error-msg').textContent =
+                    'Camera access denied. Please allow camera permissions in your browser settings.';
+            } else if (err.name === 'NotFoundError') {
+                document.getElementById('camera-error-msg').textContent =
+                    'No camera found on this device. Please use the Upload tab instead.';
+            } else {
+                document.getElementById('camera-error-msg').textContent =
+                    'Unable to start camera: ' + err.message;
+            }
+        }
+    }
+
+    function stopCamera() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+    }
+
+    captureBtn.addEventListener('click', () => {
+        if (!cameraStream) return;
+
+        cameraCanvas.width = cameraVideo.videoWidth;
+        cameraCanvas.height = cameraVideo.videoHeight;
+        const ctx = cameraCanvas.getContext('2d');
+        ctx.drawImage(cameraVideo, 0, 0);
+
+        const dataUrl = cameraCanvas.toDataURL('image/jpeg', 0.85);
+        capturedImg.src = dataUrl;
+
+        cameraVideo.style.display = 'none';
+        captureBtn.style.display = 'none';
+        cameraPreview.classList.remove('d-none');
+
+        stopCamera();
+    });
+
+    function retakePhoto() {
+        cameraPreview.classList.add('d-none');
+        startCamera();
+    }
+
+    analyzeCaptureBtn.addEventListener('click', () => {
+        // Convert canvas to blob and send
+        cameraCanvas.toBlob((blob) => {
+            if (blob) {
+                const file = new File([blob], 'camera_capture.jpg', { type: 'image/jpeg' });
+                analyzeImage(file);
+            }
+        }, 'image/jpeg', 0.85);
+    });
+
+    // ── Shared Analysis ────────────────────
+    async function analyzeImage(file) {
+        // Hide everything, show loading
+        document.getElementById('upload-mode').classList.add('d-none');
+        document.getElementById('camera-mode').classList.add('d-none');
+        resultContainer.classList.add('d-none');
+        loading.classList.remove('d-none');
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/scan', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+
+            const data = await res.json();
+            loading.classList.add('d-none');
+
+            if (res.ok) {
+                resultContainer.classList.remove('d-none');
+                lastScanResult = data;
+
+                // Hide add-to-log buttons initially
+                document.getElementById('add-to-log-btn').style.display = 'none';
+                document.getElementById('log-hint').style.display = 'none';
+                document.getElementById('log-success').style.display = 'none';
+
+                if (data.low_confidence) {
+                    // Show low-confidence warning — no option to log
+                    document.getElementById('res-name').innerText = data.food_name || 'Unknown';
+                    document.getElementById('res-name').style.color = 'var(--amber)';
+                    document.getElementById('res-cals').innerText = '—';
+                    document.getElementById('res-serving').innerText = '';
+                    document.getElementById('res-protein').innerText = '—';
+                    document.getElementById('res-carbs').innerText = '—';
+                    document.getElementById('res-fat').innerText = '—';
+                    document.getElementById('extra-macros').style.display = 'none';
+                    document.getElementById('nutrition-source').style.display = 'none';
+
+                    const msgEl = document.createElement('div');
+                    msgEl.className = 'low-conf-msg text-muted';
+                    msgEl.style.cssText = 'margin-top: 12px; font-size: 0.85rem; color: var(--amber);';
+                    msgEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message || 'Low confidence prediction'}`;
+                    document.querySelector('.result-card').appendChild(msgEl);
+                } else {
+                    // Confident result — show nutrition + offer to log
+                    document.getElementById('res-name').innerText = data.food_name;
+                    document.getElementById('res-name').style.color = '';
+                    document.getElementById('res-cals').innerText = Math.round(data.calories);
+                    document.getElementById('res-protein').innerText = data.nutrition.protein + 'g';
+                    document.getElementById('res-carbs').innerText = data.nutrition.carbohydrates + 'g';
+                    document.getElementById('res-fat').innerText = data.nutrition.fat + 'g';
+
+                    // Serving size
+                    const serving = data.nutrition.serving_size_g;
+                    document.getElementById('res-serving').innerText = serving ? `per ${serving}g serving` : 'per 100g';
+
+                    // Extra macros (fiber/sugar) — only if from API
+                    if (data.nutrition_source === 'api') {
+                        document.getElementById('extra-macros').style.display = 'flex';
+                        document.getElementById('res-fiber').innerText = (data.nutrition.fiber || 0) + 'g';
+                        document.getElementById('res-sugar').innerText = (data.nutrition.sugar || 0) + 'g';
+                    } else {
+                        document.getElementById('extra-macros').style.display = 'none';
+                    }
+
+                    // Source badges
+                    const srcEl = document.getElementById('nutrition-source');
+                    srcEl.style.display = 'block';
+                    let badgeHtml = '';
+
+                    // Recognition source
+                    if (data.recognition_source === 'huggingface_api') {
+                        badgeHtml += '<span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;background:rgba(168,85,247,0.15);color:#a855f7;margin-right:6px;">🔍 HuggingFace AI</span>';
+                    } else if (data.recognition_source === 'local_model') {
+                        badgeHtml += '<span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;background:rgba(107,114,128,0.15);color:#9ca3af;margin-right:6px;">🧠 Local Model</span>';
+                    }
+
+                    // Nutrition source
+                    if (data.nutrition_source === 'api') {
+                        badgeHtml += '<span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;background:rgba(34,197,94,0.15);color:var(--primary);">✓ USDA Nutrition</span>';
+                    } else if (data.nutrition_source === 'local_db') {
+                        badgeHtml += '<span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;background:rgba(59,130,246,0.15);color:var(--blue);">● Local DB</span>';
+                    }
+
+                    srcEl.innerHTML = badgeHtml || '';
+                    if (!badgeHtml) srcEl.style.display = 'none';
+
+                    document.getElementById('add-to-log-btn').style.display = 'block';
+                    document.getElementById('log-hint').style.display = 'block';
+                }
+            } else {
+                alert(data.error || 'Analysis failed');
+                resetScan();
+            }
+        } catch (e) {
+            console.error(e);
+            loading.classList.add('d-none');
+            alert('An error occurred');
+            resetScan();
+        }
+    }
+
+    function resetScan() {
+        loading.classList.add('d-none');
+        resultContainer.classList.add('d-none');
+        previewContainer.classList.add('d-none');
+        dropZone.classList.remove('d-none');
+        currentFile = null;
+        lastScanResult = null;
+        fileInput.value = '';
+
+        // Remove any low-confidence messages
+        document.querySelectorAll('.low-conf-msg').forEach(el => el.remove());
+
+        if (currentMode === 'upload') {
+            document.getElementById('upload-mode').classList.remove('d-none');
+        } else {
+            document.getElementById('camera-mode').classList.remove('d-none');
+            retakePhoto();
+        }
+    }
+
+    async function addToLog() {
+        if (!lastScanResult || lastScanResult.low_confidence) return;
+
+        const btn = document.getElementById('add-to-log-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        try {
+            const res = await fetchAuth('/api/log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    food_name: lastScanResult.food_name,
+                    calories: lastScanResult.calories,
+                    protein: lastScanResult.nutrition.protein,
+                    carbs: lastScanResult.nutrition.carbohydrates,
+                    fat: lastScanResult.nutrition.fat,
+                    image_url: lastScanResult.image_url
+                })
+            });
+
+            if (res && res.message) {
+                btn.style.display = 'none';
+                document.getElementById('log-hint').style.display = 'none';
+                document.getElementById('log-success').style.display = 'block';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add to Log';
+                alert('Failed to add to log');
+            }
+        } catch (e) {
+            console.error(e);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add to Log';
+        }
+    }
+
+    // Clean up camera on page leave
+    window.addEventListener('beforeunload', stopCamera);
+</script>
+{% endblock %}

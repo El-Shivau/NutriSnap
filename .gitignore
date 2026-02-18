@@ -1,2 +1,56 @@
+# ===== Virtual Environment =====
+venv/
+.env
+.env.*
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# ===== ML Model Files (too large for Git) =====
+*.hdf5
+*.h5
+*.pkl
+*.joblib
+*.tflite
+*.pb
+
+# ===== Database =====
+*.db
+*.sqlite3
+instance/
+
+# ===== Jupyter Notebooks (large output cells) =====
+.ipynb_checkpoints/
+*.ipynb
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# ===== OS Files =====
 .DS_Store
-.vscode
+Thumbs.db
+desktop.ini
+
+# ===== Uploads (user uploaded images) =====
+static/uploads/*
+!static/uploads/.gitkeep
+
+# ===== Logs =====
+*.log
+
+# ===== Misc =====
+*.bak
+*.tmp

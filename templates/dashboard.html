@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="app-container">
+    <div class="page-header fade-up">
+        <h1>Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <a href="/profile" title="Profile" style="color: var(--text-muted); font-size: 1.2rem;">
+                <i class="fas fa-user-circle"></i>
+            </a>
+            <a href="/friends" title="Friends" style="color: var(--primary); font-size: 1.2rem;">
+                <i class="fas fa-user-group"></i>
+            </a>
+            <button onclick="logout()" class="btn-icon" title="Logout"
+                style="background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Today's Calories — Hero Stat -->
+    <div class="stat-grid fade-up fade-up-delay-1">
+        <div class="glass-card stat-card stat-big">
+            <div class="stat-label">Today's Calories</div>
+            <div class="stat-value" id="today-cals">0</div>
+            <div class="stat-label">kcal</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Protein</div>
+            <div class="stat-value" id="today-protein" style="color: var(--blue);">0</div>
+            <div class="stat-label">grams</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Carbs</div>
+            <div class="stat-value" id="today-carbs" style="color: var(--amber);">0</div>
+            <div class="stat-label">grams</div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="glass-card chart-section fade-up fade-up-delay-2" style="margin-bottom: 14px;">
+        <h3>Weekly Summary</h3>
+        <canvas id="weeklyChart"></canvas>
+    </div>
+    <div class="glass-card chart-section fade-up fade-up-delay-3">
+        <h3>Monthly Trends</h3>
+        <canvas id="monthlyChart"></canvas>
+    </div>
+
+    <!-- Recent Logs -->
+    <div style="margin-top: 20px;" class="fade-up fade-up-delay-4">
+        <h3 class="section-title">Recent Logs</h3>
+        <div id="recent-logs-list">
+            <div class="glass-card text-center" style="padding: 30px;">
+                <div class="spinner"></div>
+                <p class="text-muted mt-2" style="font-size: 0.85rem;">Loading your logs...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 1. Fetch Stats
+        try {
+            const stats = await fetchAuth('/api/dashboard/stats');
+            if (!stats) return;
+
+            document.getElementById('today-cals').innerText = Math.round(stats.today.calories);
+            document.getElementById('today-protein').innerText = Math.round(stats.today.protein);
+            document.getElementById('today-carbs').innerText = Math.round(stats.today.carbs);
+
+            renderChart('weeklyChart', stats.weekly, 'Weekly');
+            renderChart('monthlyChart', stats.monthly, 'Monthly');
+        } catch (e) {
+            console.error("Error loading stats", e);
+        }
+
+        // 2. Fetch Logs
+        try {
+            const logs = await fetchAuth('/api/dashboard/logs');
+            const list = document.getElementById('recent-logs-list');
+            list.innerHTML = '';
+
+            if (!logs || logs.length === 0) {
+                list.innerHTML = '<div class="glass-card text-center" style="padding: 30px;"><p class="text-muted">No logs yet. Start scanning!</p></div>';
+                return;
+            }
+
+            logs.forEach(log => {
+                const item = document.createElement('div');
+                item.className = 'glass-card log-item';
+                item.innerHTML = `
+                    <img src="${log.image_url || ''}" class="log-img" onerror="this.style.display='none'">
+                    <div class="log-info">
+                        <div class="log-name">${log.food_name}</div>
+                        <div class="log-time">${log.created_at}</div>
+                    </div>
+                    <div class="log-cals">${Math.round(log.calories)} kcal</div>
+                `;
+                list.appendChild(item);
+            });
+        } catch (e) {
+            console.error("Error loading logs", e);
+        }
+    });
+
+    function renderChart(canvasId, data, label) {
+        if (!data || data.length === 0) return;
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Calories',
+                    data: data.map(d => d.calories),
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#22c55e',
+                    pointRadius: 4,
+                    borderWidth: 2
+                }, {
+                    label: 'Protein (g)',
+                    data: data.map(d => d.protein),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    pointBackgroundColor: '#3b82f6',
+                    pointRadius: 3,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#888', font: { size: 11 } } }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: '#555', font: { size: 10 } },
+                        grid: { color: 'rgba(255,255,255,0.04)' }
+                    },
+                    x: {
+                        ticks: { color: '#555', font: { size: 10 }, maxRotation: 45 },
+                        grid: { color: 'rgba(255,255,255,0.04)' }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

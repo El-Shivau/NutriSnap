@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="app-container">
+    <div class="page-header fade-up">
+        <a href="/dashboard" style="color: var(--text-muted); font-size: 0.9rem;">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <span class="logo-text">NutriSnap</span>
+    </div>
+
+    <div id="profile-content">
+        <div class="glass-card text-center" style="padding: 40px;">
+            <div class="spinner"></div>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Loading profile...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const data = await fetchAuth('/api/profile');
+            const container = document.getElementById('profile-content');
+
+            if (!data) {
+                container.innerHTML = '<div class="glass-card text-center" style="padding: 40px;"><p class="text-muted">Unable to load profile.</p></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <!-- Avatar -->
+                <div class="text-center fade-up" style="margin-bottom: 24px;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2rem; color: #000; font-weight: 700;">
+                        ${data.username.charAt(0).toUpperCase()}
+                    </div>
+                    <h2 style="margin: 0;">${data.username}</h2>
+                    <p class="text-muted" style="font-size: 0.9rem;">${data.email}</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="stat-grid fade-up fade-up-delay-1">
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Food Logs</div>
+                        <div class="stat-value" style="color: var(--primary);">${data.total_logs}</div>
+                        <div class="stat-label">total scans</div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Member Since</div>
+                        <div class="stat-value" style="font-size: 1.2rem; color: var(--blue);">${data.joined}</div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="fade-up fade-up-delay-2" style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+                    <a href="/friends" class="btn btn-outline w-full" style="text-align: center;">
+                        <i class="fas fa-user-group"></i> My Friends
+                    </a>
+                    <button onclick="logout()" class="btn btn-ghost w-full" style="color: var(--red);">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            `;
+        } catch (e) {
+            console.error('Error loading profile', e);
+            document.getElementById('profile-content').innerHTML =
+                '<div class="glass-card text-center" style="padding: 30px;"><p class="text-muted">Failed to load profile.</p></div>';
+        }
+    });
+</script>
+{% endblock %}

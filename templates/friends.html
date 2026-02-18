@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="app-container">
+    <div class="page-header fade-up">
+        <h1>Friends</h1>
+        <span class="logo-text">NutriSnap</span>
+    </div>
+
+    <!-- Add Friend -->
+    <div class="glass-card fade-up fade-up-delay-1" style="margin-bottom: 20px;">
+        <h3 class="section-title" style="margin-bottom: 14px;">Add Friend</h3>
+        <form id="addFriendForm" style="display: flex; gap: 10px;">
+            <input type="text" id="friendUsername" class="form-control" placeholder="Enter username" style="flex: 1;">
+            <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                <i class="fas fa-user-plus"></i> Add
+            </button>
+        </form>
+        <div id="add-status" class="d-none" style="margin-top: 10px; font-size: 0.85rem;"></div>
+    </div>
+
+    <!-- Friends List -->
+    <h3 class="section-title fade-up fade-up-delay-2">My Friends</h3>
+    <div id="friends-list">
+        <div class="glass-card text-center" style="padding: 30px;">
+            <div class="spinner"></div>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Loading friends...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add friend
+    document.getElementById('addFriendForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('friendUsername').value.trim();
+        if (!username) return;
+
+        const statusEl = document.getElementById('add-status');
+        statusEl.classList.remove('d-none');
+        statusEl.style.color = 'var(--text-muted)';
+        statusEl.textContent = 'Adding...';
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/friends/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ username })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                statusEl.style.color = 'var(--primary)';
+                statusEl.textContent = '✓ ' + data.message;
+                document.getElementById('friendUsername').value = '';
+                loadFriends(); // Refresh list
+            } else {
+                statusEl.style.color = 'var(--red)';
+                statusEl.textContent = '✕ ' + (data.error || 'Failed to add friend');
+            }
+        } catch (err) {
+            statusEl.style.color = 'var(--red)';
+            statusEl.textContent = '✕ An error occurred';
+        }
+
+        setTimeout(() => statusEl.classList.add('d-none'), 3000);
+    });
+
+    // Load friends list
+    async function loadFriends() {
+        try {
+            const friends = await fetchAuth('/api/friends');
+            const list = document.getElementById('friends-list');
+            list.innerHTML = '';
+
+            if (!friends || friends.length === 0) {
+                list.innerHTML = `
+                    <div class="glass-card text-center" style="padding: 40px;">
+                        <div style="font-size: 2rem; margin-bottom: 12px;">👥</div>
+                        <p class="text-muted">No friends yet. Add a friend by username above!</p>
+                    </div>`;
+                return;
+            }
+
+            friends.forEach((friend, i) => {
+                const card = document.createElement('a');
+                card.href = `/friends/${friend.id}`;
+                card.className = 'glass-card lb-card fade-up';
+                card.style.animationDelay = `${i * 0.06}s`;
+                card.style.opacity = '0';
+                card.style.textDecoration = 'none';
+                card.style.cursor = 'pointer';
+                card.innerHTML = `
+                    <div class="lb-rank" style="background: var(--primary); color: #000; border: none;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="lb-info">
+                        <div class="lb-username">${friend.username}</div>
+                        <div class="lb-details">Friends since ${friend.since}</div>
+                    </div>
+                    <div style="color: var(--text-muted);">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        } catch (e) {
+            console.error('Error loading friends', e);
+            document.getElementById('friends-list').innerHTML =
+                '<div class="glass-card text-center" style="padding: 30px;"><p class="text-muted">Failed to load friends.</p></div>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFriends);
+</script>
+{% endblock %}

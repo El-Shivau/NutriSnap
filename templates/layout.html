@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NutriSnap — Smart Nutrition Tracker</title>
+    <meta name="description"
+        content="Track your nutrition intelligently with AI-powered food recognition. Snap, analyze, and stay healthy.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    {% block content %}{% endblock %}
+
+    <!-- Bottom Navigation — 4 tabs only -->
+    <nav class="bottom-nav" id="bottom-nav" style="display: none;">
+        <a href="/dashboard" class="nav-item" data-page="dashboard">
+            <i class="fas fa-home nav-icon"></i>
+            <span>Home</span>
+        </a>
+        <a href="/feed" class="nav-item" data-page="feed">
+            <i class="fas fa-utensils nav-icon"></i>
+            <span>Feed</span>
+        </a>
+        <a href="/scan" class="nav-scan">
+            <div class="nav-scan-btn pulse-glow">
+                <i class="fas fa-camera"></i>
+            </div>
+            <div class="nav-scan-label">Scan</div>
+        </a>
+        <a href="/leaderboard" class="nav-item" data-page="leaderboard">
+            <i class="fas fa-trophy nav-icon"></i>
+            <span>Ranking</span>
+        </a>
+    </nav>
+
+    <script>
+        // Auth & Nav Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const nav = document.getElementById('bottom-nav');
+            const path = window.location.pathname;
+
+            // Show bottom nav only if logged in and not on landing/login/register
+            const publicPages = ['/', '/login', '/register'];
+            if (token && !publicPages.includes(path)) {
+                nav.style.display = 'flex';
+                // Highlight active tab
+                document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+                    if (path.includes(item.dataset.page)) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            window.location.href = '/';
+        }
+
+        // Authenticated fetch wrapper
+        async function fetchAuth(url, options = {}) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+                return null;
+            }
+
+            options.headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            };
+
+            try {
+                const res = await fetch(url, options);
+                if (res.status === 401) {
+                    logout();
+                    return null;
+                }
+                return res.json();
+            } catch (e) {
+                console.error('Fetch error:', e);
+                return null;
+            }
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

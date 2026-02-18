@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="app-container">
+    <div class="page-header fade-up">
+        <h1>Ranking</h1>
+        <span class="logo-text">NutriSnap</span>
+    </div>
+
+    <p class="text-muted fade-up fade-up-delay-1" style="margin-bottom: 20px; font-size: 0.9rem;">
+        Weekly rankings among you and your friends — protein, consistency, and calorie balance.
+    </p>
+
+    <div id="leaderboard-list">
+        <div class="glass-card text-center" style="padding: 40px;">
+            <div class="spinner"></div>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Loading rankings...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const data = await fetchAuth('/api/leaderboard');
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                list.innerHTML = `
+                    <div class="glass-card text-center" style="padding: 40px;">
+                        <div style="font-size: 2rem; margin-bottom: 12px;">🏆</div>
+                        <p class="text-muted">No rankings yet. Start logging food to compete!</p>
+                    </div>`;
+                return;
+            }
+
+            data.forEach((user, i) => {
+                const card = document.createElement('div');
+                const rankClass = user.rank <= 3 ? `lb-rank-${user.rank}` : '';
+                const topClass = user.rank <= 3 ? 'lb-top-card' : '';
+                const medal = user.rank === 1 ? '🥇' : user.rank === 2 ? '🥈' : user.rank === 3 ? '🥉' : '';
+
+                card.className = `glass-card lb-card ${topClass} fade-up`;
+                card.style.animationDelay = `${i * 0.06}s`;
+                card.style.opacity = '0';
+                card.innerHTML = `
+                    <div class="lb-rank ${rankClass}">${medal || user.rank}</div>
+                    <div class="lb-info">
+                        <div class="lb-username">${user.username}</div>
+                        <div class="lb-details">
+                            ${user.protein}g protein · ${Math.round(user.calories)} kcal · ${user.days_logged} days
+                        </div>
+                    </div>
+                    <div class="lb-score">${user.score}</div>
+                `;
+                list.appendChild(card);
+            });
+        } catch (e) {
+            console.error('Error loading leaderboard', e);
+            document.getElementById('leaderboard-list').innerHTML =
+                '<div class="glass-card text-center" style="padding: 30px;"><p class="text-muted">Failed to load leaderboard.</p></div>';
+        }
+    });
+</script>
+{% endblock %}

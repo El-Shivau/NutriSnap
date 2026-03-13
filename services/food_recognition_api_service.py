@@ -77,8 +77,8 @@ class FoodRecognitionAPIService:
             return results
 
         except requests.exceptions.Timeout:
-            print("[FoodAPI] Request timed out — falling back to local model")
+            print("[FoodAPI] Request timed out")
             return None
         except Exception as e:
-            print(f"[FoodAPI] Error: {e} — falling back to local model")
+            print(f"[FoodAPI] Error: {e}")
             return None

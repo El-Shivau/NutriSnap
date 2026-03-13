@@ -1,36 +1,82 @@
-# ===== Virtual Environment =====
+# ------------------------------
+# Python / virtual environments
+# ------------------------------
 venv/
-.env
-.env.*
-
-# ===== Python =====
+.venv/
+ENV/
+env/
 __pycache__/
 *.py[cod]
 *.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# ------------------------------
+# Environment / secrets
+# ------------------------------
+.env
+.env.*
+!.env.example
+
+# ------------------------------
+# Build / packaging artifacts
+# ------------------------------
+build/
+dist/
 *.egg-info/
 *.egg
-dist/
-build/
 *.whl
+pip-wheel-metadata/
 
-# ===== ML Model Files (too large for Git) =====
+# ------------------------------
+# ML / model artifacts (large)
+# ------------------------------
 *.hdf5
 *.h5
+*.keras
 *.pkl
 *.joblib
 *.tflite
 *.pb
+*.onnx
 
-# ===== Database =====
+# ------------------------------
+# Databases / runtime state
+# ------------------------------
 *.db
 *.sqlite3
 instance/
 
-# ===== Jupyter Notebooks (large output cells) =====
+# ------------------------------
+# Jupyter
+# ------------------------------
 .ipynb_checkpoints/
 *.ipynb
 
-# ===== IDE =====
+# ------------------------------
+# User uploads
+# ------------------------------
+static/uploads/*
+!static/uploads/.gitkeep
+
+# ------------------------------
+# Logs / crash dumps / temp
+# ------------------------------
+*.log
+*.out
+*.err
+*.tmp
+*.bak
+*.pid
+core
+core.*
+
+# ------------------------------
+# IDE / editor / OS
+# ------------------------------
 .vscode/
 .idea/
 *.swp
@@ -38,19 +84,6 @@ instance/
 *~
 .project
 .settings/
-
-# ===== OS Files =====
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# ===== Uploads (user uploaded images) =====
-static/uploads/*
-!static/uploads/.gitkeep
-
-# ===== Logs =====
-*.log
-
-# ===== Misc =====
-*.bak
-*.tmp

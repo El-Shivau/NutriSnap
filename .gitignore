@@ -42,6 +42,9 @@ pip-wheel-metadata/
 *.tflite
 *.pb
 *.onnx
+models/
+!models/
+!models/**/*.py
 
 # ------------------------------
 # Databases / runtime state

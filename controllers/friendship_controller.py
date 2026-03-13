@@ -1,8 +1,18 @@
 from flask import Blueprint, jsonify, request
 from security.auth import token_required
-from services.friendship_service import FriendshipService
+from services.friendship_service import FriendshipService, UserSearchService
 
 friendship_bp = Blueprint('friendship', __name__)
+
+
+@friendship_bp.route('/api/users/search', methods=['GET'])
+@token_required
+def search_users(current_user):
+    q = request.args.get('q', '').strip()
+    if not q:
+        return jsonify([])
+    results = UserSearchService.search_users(current_user.id, q)
+    return jsonify(results)
 
 
 @friendship_bp.route('/api/friends/add', methods=['POST'])
@@ -22,6 +32,27 @@ def add_friend(current_user):
 def get_friends(current_user):
     friends = FriendshipService.get_friends_list(current_user.id)
     return jsonify(friends)
+
+
+@friendship_bp.route('/api/friends/<int:friend_id>', methods=['DELETE'])
+@token_required
+def remove_friend(current_user, friend_id):
+    result, status = FriendshipService.remove_friend(current_user.id, friend_id)
+    return jsonify(result), status
+
+
+@friendship_bp.route('/api/friends/requests', methods=['GET'])
+@token_required
+def get_friend_requests(current_user):
+    result, status = FriendshipService.get_friend_requests(current_user.id)
+    return jsonify(result), status
+
+
+@friendship_bp.route('/api/friends/requests/<int:request_id>/accept', methods=['POST'])
+@token_required
+def accept_friend_request(current_user, request_id):
+    result, status = FriendshipService.accept_friend_request(current_user.id, request_id)
+    return jsonify(result), status
 
 
 @friendship_bp.route('/api/friends/<int:friend_id>/analytics', methods=['GET'])

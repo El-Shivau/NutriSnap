@@ -3,10 +3,21 @@ from repositories.user_repository import UserRepository
 from repositories.food_log_repository import FoodLogRepository
 
 
+class UserSearchService:
+    @staticmethod
+    def search_users(current_user_id, query):
+        """Return matching usernames for autocomplete (excludes self)."""
+        query = query.strip()
+        if not query:
+            return []
+        users = UserRepository.search_by_prefix(query, exclude_user_id=current_user_id)
+        return [u.username for u in users]
+
+
 class FriendshipService:
     @staticmethod
     def add_friend(user_id, friend_username):
-        """Add a friend by username. Returns success/error dict."""
+        """Send a friend request by username. Returns success/error dict."""
         friend = UserRepository.get_by_username(friend_username)
         if not friend:
             return {'error': 'User not found'}, 404
@@ -17,8 +28,14 @@ class FriendshipService:
         if FriendshipRepository.are_friends(user_id, friend.id):
             return {'error': 'Already friends'}, 400
 
-        FriendshipRepository.add_friend(user_id, friend.id)
-        return {'message': f'Added {friend.username} as friend'}, 201
+        pending = FriendshipRepository.get_pending_request_between(user_id, friend.id)
+        if pending:
+            if pending.from_user_id == user_id:
+                return {'error': 'Friend request already sent'}, 400
+            return {'error': f'{friend.username} has already sent you a request. Accept it to become friends.'}, 400
+
+        FriendshipRepository.create_friend_request(user_id, friend.id)
+        return {'message': f'Friend request sent to {friend.username}'}, 201
 
     @staticmethod
     def get_friends_list(user_id):
@@ -29,6 +46,48 @@ class FriendshipService:
             'username': f.friend.username,
             'since': f.created_at.strftime('%Y-%m-%d')
         } for f in friendships]
+
+    @staticmethod
+    def get_friend_requests(user_id):
+        incoming = FriendshipRepository.get_incoming_requests(user_id)
+        outgoing = FriendshipRepository.get_outgoing_requests(user_id)
+
+        return {
+            'incoming': [{
+                'id': req.id,
+                'from_user_id': req.from_user_id,
+                'from_username': req.from_user.username,
+                'created_at': req.created_at.strftime('%Y-%m-%d %H:%M')
+            } for req in incoming],
+            'outgoing': [{
+                'id': req.id,
+                'to_user_id': req.to_user_id,
+                'to_username': req.to_user.username,
+                'created_at': req.created_at.strftime('%Y-%m-%d %H:%M')
+            } for req in outgoing]
+        }, 200
+
+    @staticmethod
+    def accept_friend_request(user_id, request_id):
+        request = FriendshipRepository.accept_request(request_id, user_id)
+        if not request:
+            return {'error': 'Friend request not found or already handled'}, 404
+
+        friend = UserRepository.get_by_id(request.from_user_id)
+        return {'message': f'You are now friends with {friend.username}'}, 200
+
+    @staticmethod
+    def remove_friend(user_id, friend_id):
+        """Remove an existing friendship."""
+        friend = UserRepository.get_by_id(friend_id)
+        if not friend:
+            return {'error': 'User not found'}, 404
+
+        if not FriendshipRepository.are_friends(user_id, friend_id):
+            return {'error': 'You are not friends with this user'}, 400
+
+        FriendshipRepository.remove_friend(user_id, friend_id)
+        return {'message': f'Removed {friend.username} from friends'}, 200
 
     @staticmethod
     def get_friend_analytics(user_id, friend_id):

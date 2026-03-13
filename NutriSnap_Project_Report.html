@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>NutriSnap - Project Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13pt;
+            line-height: 1.8;
+            color: #000;
+            background: #fff
+        }
+
+        @media print {
+            body {
+                margin: 0
+            }
+
+            .page {
+                page-break-after: always;
+                margin: 0;
+                padding: 2.5cm 2.5cm 2.5cm 3cm;
+                box-shadow: none;
+                min-height: auto
+            }
+
+            .page:last-child {
+                page-break-after: avoid
+            }
+
+            .no-print {
+                display: none
+            }
+
+            @page {
+                margin: 0;
+                size: A4
+            }
+        }
+
+        @media screen {
+            .page {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 20px auto;
+                padding: 2.5cm 2.5cm 2.5cm 3cm;
+                background: #fff;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, .15)
+            }
+        }
+
+        .no-print {
+            text-align: center;
+            padding: 15px;
+            background: #1a1a2e;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 13pt;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .no-print button {
+            background: #4ecca3;
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            font-size: 13pt;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px
+        }
+
+        .title-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 247mm
+        }
+
+        .title-page .uni {
+            font-size: 20pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 10px
+        }
+
+        .title-page .dept {
+            font-size: 14pt;
+            margin-top: 5px
+        }
+
+        .title-page .ptitle {
+            font-size: 26pt;
+            font-weight: bold;
+            border: 3px solid #000;
+            padding: 15px 30px;
+            display: inline-block;
+            margin: 30px auto
+        }
+
+        .title-page .sub {
+            font-size: 14pt;
+            margin-top: 10px;
+            font-style: italic
+        }
+
+        h1 {
+            font-size: 18pt;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px
+        }
+
+        h2 {
+            font-size: 15pt;
+            margin-top: 22px;
+            margin-bottom: 10px
+        }
+
+        h3 {
+            font-size: 13pt;
+            margin-top: 15px;
+            margin-bottom: 8px
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 12px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 11pt
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            text-align: left
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: bold
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+            margin-bottom: 12px
+        }
+
+        li {
+            margin-bottom: 4px
+        }
+
+        .code {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 9.5pt;
+            line-height: 1.4;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            overflow-x: auto
+        }
+
+        .cert-line {
+            border-bottom: 1px solid #000;
+            width: 220px;
+            display: inline-block;
+            margin-top: 50px
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="no-print">
+        📄 NutriSnap Project Report — <strong>To save as PDF:</strong> Press <strong>Ctrl+P</strong> (or Cmd+P on Mac) →
+        Set Destination to <strong>"Save as PDF"</strong> → Click Save
+        <button onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+
+    <!-- ==================== TITLE PAGE ==================== -->
+    <div class="page title-page">
+        <div>
+            <p class="uni">Dharamsinh Desai University</p>
+            <p class="dept">Faculty of Technology<br>Department of Information Technology</p>
+        </div>
+        <div>
+            <p style="font-size:14pt;margin-bottom:10px">A Project Report on</p>
+            <div class="ptitle">NutriSnap</div>
+            <p class="sub">AI-Powered Food Recognition and Nutrition Tracking System</p>
+            <p style="font-size:13pt;margin-top:5px">Submitted in partial fulfillment of the requirements for the degree
+                of<br><strong>Bachelor of Technology in Information Technology</strong></p>
+        </div>
+        <div style="text-align:left;margin-top:20px">
+            <table style="width:80%;margin:0 auto;border:none">
+                <tr>
+                    <td style="border:none;font-weight:bold;font-size:14pt" colspan="2">Submitted By:</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding:3px 15px">Tapan Joshi</td>
+                    <td style="border:none;padding:3px 15px">Roll No: 159</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding:3px 15px">Jeel Gadhia</td>
+                    <td style="border:none;padding:3px 15px">Roll No: 157</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding:3px 15px" colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td style="border:none;font-weight:bold;font-size:14pt" colspan="2">Guided By:</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding:3px 15px" colspan="2">Prof. Viral Shah</td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <p style="font-size:14pt;font-weight:bold">Semester VI — Academic Year 2025-2026</p>
+        </div>
+    </div>
+
+    <!-- ==================== CERTIFICATE ==================== -->
+    <div class="page">
+        <h1>Certificate</h1>
+        <p style="text-align:center;margin-top:30px;line-height:2.2">
+            This is to certify that the project entitled <strong>"NutriSnap — AI-Powered Food Recognition and Nutrition
+                Tracking System"</strong> has been successfully completed by the following students of <strong>Semester
+                VI, B.Tech Information Technology</strong> at Dharamsinh Desai University in partial fulfillment of the
+            requirements for the degree of Bachelor of Technology in Information Technology during the academic year
+            2025-2026.
+        </p>
+        <table style="width:70%;margin:30px auto;border:none">
+            <tr>
+                <td style="border:none"><strong>Tapan Joshi</strong></td>
+                <td style="border:none">Roll No: 159</td>
+            </tr>
+            <tr>
+                <td style="border:none"><strong>Jeel Gadhia</strong></td>
+                <td style="border:none">Roll No: 157</td>
+            </tr>
+        </table>
+        <div style="display:flex;justify-content:space-between;margin-top:80px;text-align:center">
+            <div><span class="cert-line"></span><br><strong>Prof. Viral Shah</strong><br>Project Guide</div>
+            <div><span class="cert-line"></span><br><strong>Head of Department</strong><br>Department of IT</div>
+        </div>
+        <div style="text-align:center;margin-top:60px">
+            <span class="cert-line"></span><br><strong>External Examiner</strong>
+        </div>
+    </div>
+
+    <!-- ==================== ACKNOWLEDGEMENT ==================== -->
+    <div class="page">
+        <h1>Acknowledgement</h1>
+        <p style="margin-top:30px">We would like to express our sincere gratitude to all those who have contributed to
+            the successful completion of this project.</p>
+        <p>First and foremost, we are deeply grateful to our project guide, <strong>Prof. Viral Shah</strong>, for his
+            invaluable guidance, constant encouragement, and constructive criticism throughout the development of this
+            project. His expertise and insights have been instrumental in shaping the direction and quality of this
+            work.</p>
+        <p>We extend our heartfelt thanks to the <strong>Head of the Department of Information Technology</strong> and
+            the entire faculty of Dharamsinh Desai University for providing us with the necessary infrastructure,
+            resources, and academic environment that made this project possible.</p>
+        <p>We are also thankful to our classmates and friends for their support, helpful discussions, and encouragement
+            during the course of this project.</p>
+        <p>Finally, we would like to thank our families for their unwavering support and patience throughout our
+            academic journey.</p>
+        <br><br>
+        <p style="text-align:right"><strong>Tapan Joshi (Roll No: 159)</strong><br><strong>Jeel Gadhia (Roll No:
+                157)</strong></p>
+    </div>
+
+    <!-- ==================== ABSTRACT ==================== -->
+    <div class="page">
+        <h1>Abstract</h1>
+        <p style="margin-top:20px">In today's health-conscious society, tracking dietary intake is essential for
+            maintaining a balanced lifestyle. However, manual food logging is tedious and often inaccurate. This project
+            presents <strong>NutriSnap</strong>, an AI-powered web application that automates food recognition and
+            nutrition tracking using deep learning and computer vision techniques.</p>
+        <p>NutriSnap allows users to simply take a photograph of their food, after which the system automatically
+            identifies the food item using a Convolutional Neural Network (CNN) trained on the Food-101 dataset
+            comprising 101 food categories. The system employs a dual-recognition strategy — utilizing the Hugging Face
+            Vision Transformer (ViT) API as the primary recognizer with the local CNN model as a fallback, ensuring
+            reliability even without internet connectivity.</p>
+        <p>Upon successful food identification, the system retrieves detailed nutritional information (calories,
+            protein, carbohydrates, and fat) from the USDA FoodData Central API, with a local CSV-based database as a
+            secondary source. Users can log their meals, view daily/weekly/monthly nutrition summaries on a personalized
+            dashboard, compete with friends on a health-score leaderboard, and receive AI-driven meal recommendations
+            based on their dietary patterns.</p>
+        <p>The application is built using the Flask web framework following the MVC (Model-View-Controller) architecture
+            with Service and Repository layers, ensuring clean separation of concerns and maintainability. Security is
+            implemented through JWT (JSON Web Token) based authentication with password hashing.</p>
+        <p><strong>Keywords:</strong> Food Recognition, Deep Learning, Convolutional Neural Network, Nutrition Tracking,
+            Computer Vision, Flask, Food-101, Vision Transformer, REST API</p>
+    </div>
+
+    <!-- ==================== TABLE OF CONTENTS ==================== -->
+    <div class="page">
+        <h1>Table of Contents</h1>
+        <div style="margin-top:20px;line-height:2.5">
+            <table style="border:none;font-size:13pt">
+                <tr>
+                    <td style="border:none"><strong>Certificate</strong></td>
+                    <td style="border:none;text-align:right">ii</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Acknowledgement</strong></td>
+                    <td style="border:none;text-align:right">iii</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Abstract</strong></td>
+                    <td style="border:none;text-align:right">iv</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Chapter 1: Introduction</strong></td>
+                    <td style="border:none;text-align:right">1</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding-left:25px">1.1 Project Overview</td>
+                    <td style="border:none;text-align:right">1</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding-left:25px">1.2 Problem Statement</td>
+                    <td style="border:none;text-align:right">1</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding-left:25px">1.3 Objectives</td>
+                    <td style="border:none;text-align:right">2</td>
+                </tr>
+                <tr>
+                    <td style="border:none;padding-left:25px">1.4 Scope of the Project</td>
+                    <td style="border:none;text-align:right">2</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Chapter 2: Literature Survey</strong></td>
+                    <td style="border:none;text-align:right">3</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Chapter 3: System Requirements</strong></td>
+                    <td style="border:none;text-align:right">5</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Chapter 4: System Design</strong></td>
+                    <td style="border:none;text-align:right">7</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Chapter 5: Implementation</strong></td>
+                    <td style="border:none;text-align:right">10</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Chapter 6: Testing</strong></td>
+                    <td style="border:none;text-align:right">18</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>Chapter 7: Conclusion & Future Scope</strong></td>
+                    <td style="border:none;text-align:right">20</td>
+                </tr>
+                <tr>
+                    <td style="border:none"><strong>References</strong></td>
+                    <td style="border:none;text-align:right">21</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== CHAPTER 1: INTRODUCTION ==================== -->
+    <div class="page">
+        <h1>Chapter 1: Introduction</h1>
+
+        <h2>1.1 Project Overview</h2>
+        <p>NutriSnap is an AI-powered web application designed to simplify nutrition tracking through automated food
+            recognition. Instead of manually searching for food items and entering nutritional data, users can simply
+            photograph their meal, and the system automatically identifies the food and retrieves its complete
+            nutritional profile including calories, protein, carbohydrates, and fat content.</p>
+        <p>The application integrates deep learning models for image classification, external APIs for accurate
+            nutrition data, and a comprehensive dashboard for tracking dietary patterns over time. It also features
+            social elements such as a friends system, health-score leaderboard, and personalized meal recommendations.
+        </p>
+
+        <h2>1.2 Problem Statement</h2>
+        <p>In the modern era, lifestyle diseases such as obesity, diabetes, and cardiovascular disorders are on the
+            rise, largely due to poor dietary habits. While nutrition tracking applications exist (such as
+            MyFitnessPal), they require users to manually search and log every food item — a process that is:</p>
+        <ul>
+            <li><strong>Time-consuming:</strong> Users must type food names, select portion sizes, and verify
+                nutritional data for each meal.</li>
+            <li><strong>Error-prone:</strong> Manual entry leads to inaccurate logging due to estimation errors and
+                incomplete data entry.</li>
+            <li><strong>Inconvenient:</strong> The friction of manual logging causes most users to abandon food tracking
+                within weeks.</li>
+        </ul>
+        <p>There is a need for an automated system that can recognize food from images and instantly provide accurate
+            nutritional information, thereby reducing the effort required for dietary tracking.</p>
+
+        <h2>1.3 Objectives</h2>
+        <ol>
+            <li>To develop a food recognition system using Convolutional Neural Networks (CNN) capable of identifying
+                101 food categories from images.</li>
+            <li>To integrate external APIs (Hugging Face and USDA) for enhanced accuracy in food recognition and
+                nutrition data retrieval.</li>
+            <li>To build a web-based dashboard for visualizing daily, weekly, and monthly nutrition summaries.</li>
+            <li>To implement a leaderboard and recommendation system to encourage healthy eating habits.</li>
+            <li>To ensure secure user authentication using JWT-based token authentication.</li>
+            <li>To follow clean software architecture principles (MVC + Service-Repository pattern).</li>
+        </ol>
+
+        <h2>1.4 Scope of the Project</h2>
+        <p>The system can recognize 101 food categories from the Food-101 dataset. It provides nutritional tracking for
+            individual users with features including meal logging, dashboard analytics, social leaderboards, friend
+            analytics, and meal recommendations. The application is designed as a responsive web application accessible
+            via both desktop and mobile browsers.</p>
+    </div>
+
+    <!-- ==================== CHAPTER 2: LITERATURE SURVEY ==================== -->
+    <div class="page">
+        <h1>Chapter 2: Literature Survey</h1>
+
+        <h2>2.1 Food Recognition Using Deep Learning</h2>
+        <p>Bossard et al. (2014) introduced the Food-101 dataset, comprising 101,000 images across 101 food categories.
+            This dataset has become the standard benchmark for food recognition research, achieving baseline accuracy of
+            50.76% using Random Forests. Subsequent deep learning approaches have significantly improved upon this, with
+            modern CNN architectures achieving over 90% accuracy.</p>
+
+        <h2>2.2 Convolutional Neural Networks (CNNs)</h2>
+        <p>CNNs are a class of deep learning models specifically designed for processing visual data. They use
+            convolutional layers to automatically learn hierarchical features from images — from simple edges in early
+            layers to complex food textures and shapes in deeper layers. Key architectures include VGGNet, ResNet,
+            InceptionNet, and EfficientNet, all of which have been successfully applied to food recognition tasks.</p>
+
+        <h2>2.3 Vision Transformers (ViT)</h2>
+        <p>Dosovitskiy et al. (2020) introduced the Vision Transformer, which applies the Transformer architecture
+            (originally designed for NLP) to image classification. ViT divides an image into fixed-size patches,
+            linearly embeds each patch, and processes them using standard Transformer encoder blocks. The nateraw/food
+            model used in NutriSnap is a ViT fine-tuned on the Food-101 dataset, offering superior accuracy compared to
+            traditional CNNs.</p>
+
+        <h2>2.4 Nutrition APIs and Databases</h2>
+        <p>The USDA FoodData Central database is the most comprehensive publicly available food composition database,
+            maintained by the United States Department of Agriculture. It provides detailed nutritional information for
+            thousands of food items, including macronutrients, vitamins, and minerals. The database is accessible
+            through a free REST API.</p>
+
+        <h2>2.5 Existing Systems Comparison</h2>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>MyFitnessPal</th>
+                <th>Calorie Mama</th>
+                <th>NutriSnap (Ours)</th>
+            </tr>
+            <tr>
+                <td>Food Recognition</td>
+                <td>Manual search only</td>
+                <td>AI-based</td>
+                <td>AI-based (dual model)</td>
+            </tr>
+            <tr>
+                <td>Offline Support</td>
+                <td>No</td>
+                <td>No</td>
+                <td>Yes (local model fallback)</td>
+            </tr>
+            <tr>
+                <td>Nutrition Source</td>
+                <td>User-contributed DB</td>
+                <td>Proprietary</td>
+                <td>USDA API + local CSV</td>
+            </tr>
+            <tr>
+                <td>Social Features</td>
+                <td>Basic</td>
+                <td>None</td>
+                <td>Leaderboard + Friends</td>
+            </tr>
+            <tr>
+                <td>Recommendations</td>
+                <td>None</td>
+                <td>None</td>
+                <td>AI-based meal suggestions</td>
+            </tr>
+            <tr>
+                <td>Cost</td>
+                <td>Freemium</td>
+                <td>Paid</td>
+                <td>Free / Open-source</td>
+            </tr>
+        </table>
+
+        <h2>2.6 JWT Authentication</h2>
+        <p>JSON Web Tokens (JWT) are an open standard (RFC 7519) for securely transmitting information between parties
+            as a JSON object. JWTs are widely used for stateless authentication in modern web applications, eliminating
+            the need for server-side session storage and enabling scalability across multiple servers.</p>
+    </div>
+
+    <!-- ==================== CHAPTER 3: SYSTEM REQUIREMENTS ==================== -->
+    <div class="page">
+        <h1>Chapter 3: System Requirements</h1>
+
+        <h2>3.1 Hardware Requirements</h2>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Minimum Requirement</th>
+            </tr>
+            <tr>
+                <td>Processor</td>
+                <td>Intel Core i3 / AMD equivalent or higher</td>
+            </tr>
+            <tr>
+                <td>RAM</td>
+                <td>4 GB (8 GB recommended for ML model loading)</td>
+            </tr>
+            <tr>
+                <td>Storage</td>
+                <td>500 MB free disk space (including ML model file)</td>
+            </tr>
+            <tr>
+                <td>Camera</td>
+                <td>Any device camera or webcam (for live scanning)</td>
+            </tr>
+            <tr>
+                <td>Internet</td>
+                <td>Required for API-based recognition; optional for local model</td>
+            </tr>
+        </table>
+
+        <h2>3.2 Software Requirements</h2>
+        <table>
+            <tr>
+                <th>Software</th>
+                <th>Version</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>Python</td>
+                <td>3.8+</td>
+                <td>Backend programming language</td>
+            </tr>
+            <tr>
+                <td>Flask</td>
+                <td>2.x</td>
+                <td>Web application framework</td>
+            </tr>
+            <tr>
+                <td>TensorFlow</td>
+                <td>2.x</td>
+                <td>Deep learning model loading and inference</td>
+            </tr>
+            <tr>
+                <td>SQLAlchemy</td>
+                <td>1.4+</td>
+                <td>ORM for database operations</td>
+            </tr>
+            <tr>
+                <td>SQLite</td>
+                <td>3.x</td>
+                <td>Relational database</td>
+            </tr>
+            <tr>
+                <td>PyJWT</td>
+                <td>2.x</td>
+                <td>JWT token generation and verification</td>
+            </tr>
+            <tr>
+                <td>NumPy</td>
+                <td>1.x</td>
+                <td>Numerical computation for image processing</td>
+            </tr>
+            <tr>
+                <td>Werkzeug</td>
+                <td>2.x</td>
+                <td>Password hashing and HTTP utilities</td>
+            </tr>
+            <tr>
+                <td>HTML/CSS/JS</td>
+                <td>—</td>
+                <td>Frontend user interface</td>
+            </tr>
+        </table>
+
+        <h2>3.3 Functional Requirements</h2>
+        <ol>
+            <li>The system shall allow users to register and login securely.</li>
+            <li>The system shall accept food images via upload or camera capture.</li>
+            <li>The system shall recognize food items from images using deep learning.</li>
+            <li>The system shall retrieve and display nutritional information for recognized food.</li>
+            <li>The system shall allow users to log recognized food to their personal food log.</li>
+            <li>The system shall display daily, weekly, and monthly nutrition summaries.</li>
+            <li>The system shall provide a leaderboard ranking users by health score.</li>
+            <li>The system shall generate meal recommendations based on eating patterns.</li>
+            <li>The system shall support adding friends and viewing friend analytics.</li>
+        </ol>
+
+        <h2>3.4 Non-Functional Requirements</h2>
+        <ol>
+            <li><strong>Performance:</strong> Food recognition shall complete within 15 seconds.</li>
+            <li><strong>Reliability:</strong> System shall provide fallback mechanisms when APIs are unavailable.</li>
+            <li><strong>Security:</strong> Passwords shall be hashed; all API endpoints shall require authentication.
+            </li>
+            <li><strong>Usability:</strong> The interface shall be responsive and mobile-friendly.</li>
+            <li><strong>Maintainability:</strong> Code shall follow MVC architecture with clear separation of concerns.
+            </li>
+        </ol>
+    </div>
+
+    <!-- ==================== CHAPTER 4: SYSTEM DESIGN ==================== -->
+    <div class="page">
+        <h1>Chapter 4: System Design</h1>
+
+        <h2>4.1 System Architecture</h2>
+        <p>NutriSnap follows the <strong>MVC (Model-View-Controller) architecture</strong> enhanced with
+            <strong>Service</strong> and <strong>Repository</strong> layers for clean separation of concerns:</p>
+        <ul>
+            <li><strong>Model Layer:</strong> Defines database schema using SQLAlchemy ORM (User, FoodLog,
+                NutritionInfo, Friendship).</li>
+            <li><strong>View Layer:</strong> HTML templates rendered by Flask's Jinja2 template engine with
+                CSS/JavaScript frontend.</li>
+            <li><strong>Controller Layer:</strong> Flask Blueprints that handle HTTP requests and route them to
+                appropriate services.</li>
+            <li><strong>Service Layer:</strong> Contains business logic — ML inference, nutrition lookup, leaderboard
+                scoring, recommendations.</li>
+            <li><strong>Repository Layer:</strong> Encapsulates all database queries using SQLAlchemy, providing clean
+                data access methods.</li>
+        </ul>
+
+        <h2>4.2 Architecture Diagram</h2>
+        <div style="text-align:center;margin:20px 0">
+            <table style="width:90%;margin:0 auto;text-align:center">
+                <tr>
+                    <td style="background:#e3f2fd;padding:15px;font-weight:bold">👤 User (Browser)</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px">↕</td>
+                </tr>
+                <tr>
+                    <td style="background:#fff3e0;padding:15px;font-weight:bold">🎨 Views (HTML/CSS/JS Templates)</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px">↕</td>
+                </tr>
+                <tr>
+                    <td style="background:#e8f5e9;padding:15px;font-weight:bold">🎮 Controllers (Flask Blueprints)</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px">↕</td>
+                </tr>
+                <tr>
+                    <td style="background:#fce4ec;padding:15px;font-weight:bold">🧠 Services (Business Logic + ML)</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px">↕
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        ↕</td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="width:100%;border:none">
+                            <tr>
+                                <td style="background:#f3e5f5;padding:12px;font-weight:bold;width:50%">💾 Repositories →
+                                    SQLite DB</td>
+                                <td style="background:#fff8e1;padding:12px;font-weight:bold;width:50%">🌐 External APIs
+                                    (HF + USDA)</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>4.3 Database Design (ER Diagram)</h2>
+        <p>The system uses four interconnected tables:</p>
+        <table>
+            <tr>
+                <th>Table</th>
+                <th>Primary Key</th>
+                <th>Key Columns</th>
+                <th>Relationships</th>
+            </tr>
+            <tr>
+                <td>users</td>
+                <td>id</td>
+                <td>username, email, password_hash, role</td>
+                <td>Has many food_logs, Has many friendships</td>
+            </tr>
+            <tr>
+                <td>food_logs</td>
+                <td>id</td>
+                <td>food_name, calories, protein, carbs, fat, image_url</td>
+                <td>Belongs to users (via user_id FK)</td>
+            </tr>
+            <tr>
+                <td>nutrition_info</td>
+                <td>id</td>
+                <td>food_name, calories_per_100g, protein, carbs, fat</td>
+                <td>Standalone reference table</td>
+            </tr>
+            <tr>
+                <td>friendships</td>
+                <td>id</td>
+                <td>user_id, friend_id, created_at</td>
+                <td>References users table (two FKs)</td>
+            </tr>
+        </table>
+
+        <h2>4.4 Food Recognition Pipeline</h2>
+        <p>The food recognition system uses a dual-model strategy with fallback mechanism:</p>
+        <ol>
+            <li><strong>Step 1 — Image Upload:</strong> User captures or uploads a food image via the web interface.
+            </li>
+            <li><strong>Step 2 — Primary Recognition (Hugging Face API):</strong> Image bytes are sent to the Hugging
+                Face nateraw/food Vision Transformer model via HTTP POST. If confidence ≥ 60%, the result is accepted.
+            </li>
+            <li><strong>Step 3 — Fallback Recognition (Local CNN):</strong> If the API fails or returns low confidence,
+                the local CNN model processes the image: resize to 200×200, normalize pixels to [0,1], predict across
+                101 classes.</li>
+            <li><strong>Step 4 — Nutrition Lookup:</strong> The identified food name is queried against the USDA API. If
+                unavailable, local CSV data is used.</li>
+            <li><strong>Step 5 — Result Display:</strong> Food name, confidence score, and full nutrition breakdown are
+                returned to the user.</li>
+        </ol>
+    </div>
+
+    <!-- ==================== CHAPTER 4 continued: Use Case & DFD ==================== -->
+    <div class="page">
+        <h2>4.5 Use Case Diagram</h2>
+        <table>
+            <tr>
+                <th>Actor</th>
+                <th>Use Case</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>Register</td>
+                <td>Create a new account with username, email, password</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>Login</td>
+                <td>Authenticate using email and password</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>Scan Food</td>
+                <td>Upload/capture food image for AI recognition</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>View Results</td>
+                <td>See food name, confidence, and nutrition data</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>Log Food</td>
+                <td>Save recognized food to personal food log</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>View Dashboard</td>
+                <td>See daily/weekly/monthly nutrition summaries</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>View Leaderboard</td>
+                <td>See weekly health score ranking among friends</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>Get Recommendations</td>
+                <td>Receive personalized meal suggestions</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>Add Friends</td>
+                <td>Connect with other users by username</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>View Friend Analytics</td>
+                <td>See a friend's nutrition stats and recent meals</td>
+            </tr>
+            <tr>
+                <td>System</td>
+                <td>Food Recognition</td>
+                <td>Identify food using AI (HF API + local CNN)</td>
+            </tr>
+            <tr>
+                <td>System</td>
+                <td>Nutrition Lookup</td>
+                <td>Fetch nutrition data (USDA API + local CSV)</td>
+            </tr>
+        </table>
+
+        <h2>4.6 Data Flow Diagram (Level 0)</h2>
+        <table style="text-align:center">
+            <tr>
+                <td style="background:#e3f2fd;width:20%"><strong>User</strong></td>
+                <td style="width:10%">→<br>Image<br>Credentials</td>
+                <td style="background:#e8f5e9;width:40%"><strong>NutriSnap System</strong><br>(Process food image →
+                    Recognize → Get nutrition → Log)</td>
+                <td style="width:10%">→<br>Food Name<br>Nutrition<br>Dashboard</td>
+                <td style="background:#e3f2fd;width:20%"><strong>User</strong></td>
+            </tr>
+        </table>
+        <p style="text-align:center;margin-top:5px">↕ Data Store: SQLite Database &nbsp;&nbsp;&nbsp; ↕ External: HF API,
+            USDA API</p>
+
+        <h2>4.7 Class Diagram (Key Classes)</h2>
+        <table>
+            <tr>
+                <th>Class</th>
+                <th>Key Attributes</th>
+                <th>Key Methods</th>
+            </tr>
+            <tr>
+                <td>MLService</td>
+                <td>model, nutrition_table, label[], CONFIDENCE_THRESHOLD</td>
+                <td>initialize(), predict(), load_labels(), _find_nutrition()</td>
+            </tr>
+            <tr>
+                <td>AuthService</td>
+                <td>—</td>
+                <td>register(), login()</td>
+            </tr>
+            <tr>
+                <td>FoodLogService</td>
+                <td>—</td>
+                <td>log_food(), get_recent_logs(), get_dashboard_stats()</td>
+            </tr>
+            <tr>
+                <td>LeaderboardService</td>
+                <td>PROTEIN_GOAL, CALORIE_MIN, CALORIE_MAX</td>
+                <td>get_weekly_leaderboard()</td>
+            </tr>
+            <tr>
+                <td>RecommendationService</td>
+                <td>HEALTHY_MEALS[], thresholds</td>
+                <td>get_recommendations()</td>
+            </tr>
+            <tr>
+                <td>FriendshipService</td>
+                <td>—</td>
+                <td>add_friend(), get_friends_list(), get_friend_analytics()</td>
+            </tr>
+            <tr>
+                <td>FoodLogRepository</td>
+                <td>—</td>
+                <td>create(), get_daily_totals(), get_weekly_summary(), get_weekly_averages()</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ==================== CHAPTER 5: IMPLEMENTATION ==================== -->
+    <div class="page">
+        <h1>Chapter 5: Implementation</h1>
+
+        <h2>5.1 Project Structure</h2>
+        <div class="code">NutriSnap/
+            ├── app.py # Application entry point
+            ├── config.py # Configuration settings
+            ├── extensions.py # Database initialization
+            ├── models/ # Database models (ORM)
+            │ ├── user.py # User model
+            │ ├── food_log.py # Food log model
+            │ ├── nutrition_info.py # Nutrition data model
+            │ └── friendship.py # Friendship model
+            ├── controllers/ # HTTP request handlers
+            │ ├── auth_controller.py # Authentication endpoints
+            │ ├── scan_controller.py # Food scanning endpoints
+            │ ├── api_controller.py # Dashboard/profile endpoints
+            │ ├── view_controller.py # HTML page routing
+            │ ├── leaderboard_controller.py
+            │ ├── recommendation_controller.py
+            │ └── friendship_controller.py
+            ├── services/ # Business logic
+            │ ├── ml_service.py # AI/ML food recognition
+            │ ├── auth_service.py # Authentication logic
+            │ ├── food_log_service.py # Food logging logic
+            │ ├── nutrition_service.py # Local nutrition DB
+            │ ├── food_recognition_api_service.py # HF API
+            │ ├── nutrition_api_service.py # USDA API
+            │ ├── leaderboard_service.py
+            │ ├── recommendation_service.py
+            │ └── friendship_service.py
+            ├── repositories/ # Database access layer
+            ├── security/auth.py # JWT authentication
+            ├── templates/ # HTML templates
+            ├── static/ # CSS, images, uploads
+            ├── best_model_101class.hdf5 # Trained CNN model (175MB)
+            └── nutrition101.csv # Nutrition data (101 foods)</div>
+
+        <h2>5.2 Application Entry Point (app.py)</h2>
+        <p>The application is initialized using Flask's application factory pattern. The <code>create_app()</code>
+            function configures the application, initializes extensions, loads the ML model, seeds the nutrition
+            database, and registers all controller blueprints.</p>
+        <div class="code">def create_app():
+            app = Flask(__name__)
+            app.config.from_object(Config)
+            db.init_app(app)
+            with app.app_context():
+            MLService.initialize()
+            db.create_all()
+            NutritionService.seed_from_csv()
+            # Register all 7 blueprints
+            app.register_blueprint(auth_bp)
+            app.register_blueprint(scan_bp)
+            # ... (5 more blueprints)
+            return app</div>
+
+        <h2>5.3 ML Service — Food Recognition (Core Feature)</h2>
+        <p>The MLService class is the heart of the application. It implements a dual-model recognition strategy:</p>
+
+        <h3>5.3.1 Primary Recognition — Hugging Face API</h3>
+        <p>The system first sends the food image to the Hugging Face Inference API, which hosts the
+            <code>nateraw/food</code> Vision Transformer model. This model was fine-tuned on the Food-101 dataset.</p>
+        <div class="code">response = requests.post(
+            'https://api-inference.huggingface.co/models/nateraw/food',
+            headers=headers,
+            data=image_bytes,
+            timeout=15
+            )</div>
+
+        <h3>5.3.2 Fallback — Local CNN Model</h3>
+        <p>If the API fails or returns low confidence (&lt;60%), the local model is used:</p>
+        <div class="code"># Load and preprocess image
+            img = image.load_img(image_path, target_size=(200, 200))
+            img_array = image.img_to_array(img)
+            img_array = np.expand_dims(img_array, axis=0)
+            img_array = img_array / 255.0 # Normalize to [0, 1]
+
+            # Predict
+            pred = cls.model.predict(img_array)
+            top_indices = np.argsort(pred[0])[-3:][::-1] # Top 3
+            food_name = cls.label[top_indices[0]]
+            confidence = float(pred[0][top_indices[0]])</div>
+    </div>
+
+    <!-- ==================== CHAPTER 5 continued ==================== -->
+    <div class="page">
+        <h2>5.4 Authentication System</h2>
+        <p>User authentication is implemented using JWT (JSON Web Tokens). The security module provides three key
+            functions:</p>
+        <ul>
+            <li><strong>generate_token(user_id):</strong> Creates a JWT containing the user ID, issue time, and
+                expiration (24 hours).</li>
+            <li><strong>token_required decorator:</strong> Validates the JWT from the Authorization header before
+                allowing access to protected endpoints.</li>
+            <li><strong>role_required(roles) decorator:</strong> Provides role-based access control (USER, TRAINER,
+                DOCTOR).</li>
+        </ul>
+        <p>Passwords are hashed using Werkzeug's <code>generate_password_hash()</code> function (bcrypt-based) before
+            storage. Plain-text passwords are never stored in the database.</p>
+
+        <h2>5.5 Database Models</h2>
+        <p>Four SQLAlchemy models define the database schema:</p>
+        <div class="code">class User(db.Model):
+            id = db.Column(db.Integer, primary_key=True)
+            username = db.Column(db.String(80), unique=True, nullable=False)
+            email = db.Column(db.String(120), unique=True, nullable=False)
+            password_hash = db.Column(db.String(255), nullable=False)
+            role = db.Column(db.String(20), default='USER')
+
+            class FoodLog(db.Model):
+            id = db.Column(db.Integer, primary_key=True)
+            user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+            food_name = db.Column(db.String(100), nullable=False)
+            calories = db.Column(db.Float, nullable=False)
+            protein = db.Column(db.Float, nullable=False)
+            carbs = db.Column(db.Float, nullable=False)
+            fat = db.Column(db.Float, nullable=False)</div>
+
+        <h2>5.6 Leaderboard Scoring Algorithm</h2>
+        <p>The leaderboard uses a 100-point scoring system calculated weekly:</p>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Max Points</th>
+                <th>Formula</th>
+            </tr>
+            <tr>
+                <td>Protein Score</td>
+                <td>40</td>
+                <td>min((weekly_protein / 350) × 40, 40)</td>
+            </tr>
+            <tr>
+                <td>Consistency Score</td>
+                <td>30</td>
+                <td>(days_logged / 7) × 30</td>
+            </tr>
+            <tr>
+                <td>Calorie Balance</td>
+                <td>30</td>
+                <td>30 if 1500 ≤ avg_daily_cal ≤ 2500, else 0</td>
+            </tr>
+        </table>
+
+        <h2>5.7 Recommendation Engine</h2>
+        <p>The recommendation service analyzes the user's 7-day dietary averages and identifies nutritional gaps. Based
+            on identified gaps, it suggests meals from a curated database of 18 healthy meals tagged with categories
+            (high_protein, low_calorie, low_carb, healthy_fat).</p>
+        <table>
+            <tr>
+                <th>Gap Detected</th>
+                <th>Tag Applied</th>
+                <th>Example Recommendations</th>
+            </tr>
+            <tr>
+                <td>Protein &lt; 30g/day</td>
+                <td>high_protein</td>
+                <td>Grilled Chicken, Salmon, Greek Yogurt</td>
+            </tr>
+            <tr>
+                <td>Calories &gt; 2200 kcal/day</td>
+                <td>low_calorie</td>
+                <td>Mixed Salad, Miso Soup, Steamed Fish</td>
+            </tr>
+            <tr>
+                <td>Carbs &gt; 250g/day</td>
+                <td>low_carb</td>
+                <td>Zucchini Noodles, Cauliflower Rice</td>
+            </tr>
+            <tr>
+                <td>Fat &lt; 20g/day</td>
+                <td>healthy_fat</td>
+                <td>Avocado Toast, Trail Mix, Chia Pudding</td>
+            </tr>
+        </table>
+
+        <h2>5.8 API Endpoints Summary</h2>
+        <table>
+            <tr>
+                <th>Endpoint</th>
+                <th>Method</th>
+                <th>Auth</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>/api/auth/register</td>
+                <td>POST</td>
+                <td>No</td>
+                <td>User registration</td>
+            </tr>
+            <tr>
+                <td>/api/auth/login</td>
+                <td>POST</td>
+                <td>No</td>
+                <td>User login (returns JWT)</td>
+            </tr>
+            <tr>
+                <td>/api/scan</td>
+                <td>POST</td>
+                <td>JWT</td>
+                <td>Scan food image</td>
+            </tr>
+            <tr>
+                <td>/api/log</td>
+                <td>POST</td>
+                <td>JWT</td>
+                <td>Save food to log</td>
+            </tr>
+            <tr>
+                <td>/api/dashboard/stats</td>
+                <td>GET</td>
+                <td>JWT</td>
+                <td>Dashboard statistics</td>
+            </tr>
+            <tr>
+                <td>/api/dashboard/logs</td>
+                <td>GET</td>
+                <td>JWT</td>
+                <td>Recent food logs</td>
+            </tr>
+            <tr>
+                <td>/api/profile</td>
+                <td>GET</td>
+                <td>JWT</td>
+                <td>User profile info</td>
+            </tr>
+            <tr>
+                <td>/api/leaderboard</td>
+                <td>GET</td>
+                <td>JWT</td>
+                <td>Weekly leaderboard</td>
+            </tr>
+            <tr>
+                <td>/api/recommendations</td>
+                <td>GET</td>
+                <td>JWT</td>
+                <td>Meal recommendations</td>
+            </tr>
+            <tr>
+                <td>/api/friends/add</td>
+                <td>POST</td>
+                <td>JWT</td>
+                <td>Add a friend</td>
+            </tr>
+            <tr>
+                <td>/api/friends</td>
+                <td>GET</td>
+                <td>JWT</td>
+                <td>List friends</td>
+            </tr>
+            <tr>
+                <td>/api/friends/:id/analytics</td>
+                <td>GET</td>
+                <td>JWT</td>
+                <td>Friend's nutrition stats</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ==================== CHAPTER 6: TESTING ==================== -->
+    <div class="page">
+        <h1>Chapter 6: Testing</h1>
+
+        <h2>6.1 Testing Approach</h2>
+        <p>The system was tested using a combination of manual testing, API testing, and component-level testing to
+            ensure reliability across all features.</p>
+
+        <h2>6.2 Test Cases</h2>
+        <table>
+            <tr>
+                <th>Sr.</th>
+                <th>Test Case</th>
+                <th>Input</th>
+                <th>Expected Output</th>
+                <th>Result</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>User Registration</td>
+                <td>Valid username, email, password</td>
+                <td>Account created, 201 status</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Duplicate Registration</td>
+                <td>Existing email</td>
+                <td>Error: "User already exists", 400</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Login with valid credentials</td>
+                <td>Correct email and password</td>
+                <td>JWT token returned, 200</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Login with wrong password</td>
+                <td>Wrong password</td>
+                <td>Error: "Invalid credentials", 401</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Scan food image (API)</td>
+                <td>Photo of pizza</td>
+                <td>"pizza", confidence &gt; 60%</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Scan food (local model fallback)</td>
+                <td>Photo when API unavailable</td>
+                <td>Local model prediction returned</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Scan without token</td>
+                <td>No Authorization header</td>
+                <td>Error: "Token is missing", 401</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Log food to database</td>
+                <td>Scanned food data</td>
+                <td>Entry saved, confirmation message</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Dashboard statistics</td>
+                <td>User with logged meals</td>
+                <td>Daily/weekly/monthly totals</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Leaderboard ranking</td>
+                <td>Multiple users with logs</td>
+                <td>Sorted by health score</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>Recommendations (low protein)</td>
+                <td>User with avg protein &lt; 30g</td>
+                <td>High-protein meals suggested</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>Add friend</td>
+                <td>Valid username</td>
+                <td>Friend added, 201</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>Add self as friend</td>
+                <td>Own username</td>
+                <td>Error: "Cannot add yourself", 400</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>Expired token access</td>
+                <td>Expired JWT</td>
+                <td>Error: "Token expired", 401</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>Nutrition lookup (USDA)</td>
+                <td>Food name "hamburger"</td>
+                <td>Nutrition data returned</td>
+                <td>Pass ✓</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>Low confidence handling</td>
+                <td>Ambiguous food image</td>
+                <td>Low confidence warning shown</td>
+                <td>Pass ✓</td>
+            </tr>
+        </table>
+
+        <h2>6.3 Testing Tools</h2>
+        <ul>
+            <li><strong>Browser Developer Tools:</strong> Used for testing frontend interactions, network requests, and
+                debugging JavaScript.</li>
+            <li><strong>Postman / cURL:</strong> Used for API endpoint testing with custom headers and request bodies.
+            </li>
+            <li><strong>Flask Debug Mode:</strong> Enabled during development for real-time error reporting and
+                auto-reload on code changes.</li>
+        </ul>
+    </div>
+
+    <!-- ==================== CHAPTER 7: CONCLUSION ==================== -->
+    <div class="page">
+        <h1>Chapter 7: Conclusion & Future Scope</h1>
+
+        <h2>7.1 Conclusion</h2>
+        <p>NutriSnap successfully demonstrates the practical application of deep learning and computer vision in the
+            domain of health and nutrition. The system achieves its primary objective of automating food recognition and
+            nutrition tracking, significantly reducing the manual effort traditionally required for dietary monitoring.
+        </p>
+        <p>Key achievements of this project include:</p>
+        <ul>
+            <li>Successful implementation of a dual-model food recognition system capable of identifying 101 food
+                categories with a confidence threshold mechanism.</li>
+            <li>Integration of the Hugging Face Vision Transformer API as the primary recognizer with a local CNN model
+                as a reliable fallback.</li>
+            <li>Development of a comprehensive nutrition tracking dashboard with daily, weekly, and monthly analytics.
+            </li>
+            <li>Implementation of a gamified leaderboard system to encourage healthy eating among friends.</li>
+            <li>Creation of an AI-driven recommendation engine that analyzes dietary patterns and suggests nutritionally
+                appropriate meals.</li>
+            <li>Secure authentication system using JWT tokens and password hashing.</li>
+            <li>Clean, maintainable codebase following MVC + Service-Repository architecture.</li>
+        </ul>
+
+        <h2>7.2 Limitations</h2>
+        <ul>
+            <li>The system is limited to 101 food categories from the Food-101 dataset. Regional and traditional dishes
+                may not be recognized.</li>
+            <li>Food images with multiple items on the same plate are not individually identified.</li>
+            <li>Portion size estimation is not implemented — nutrition data assumes a standard 100g serving.</li>
+            <li>The Hugging Face free API has rate limits (~30 requests/hour).</li>
+        </ul>
+
+        <h2>7.3 Future Scope</h2>
+        <ul>
+            <li><strong>Multi-food Detection:</strong> Implement object detection (YOLO/Faster R-CNN) to identify
+                multiple food items on a single plate.</li>
+            <li><strong>Portion Estimation:</strong> Integrate depth sensing or reference object detection to estimate
+                food quantity.</li>
+            <li><strong>Expanded Dataset:</strong> Train the model on a larger dataset including Indian, Asian, and
+                regional cuisines.</li>
+            <li><strong>Mobile Application:</strong> Port the system to native Android/iOS using React Native or
+                Flutter.</li>
+            <li><strong>Barcode Scanning:</strong> Add barcode/QR code scanning for packaged food items.</li>
+            <li><strong>Health Integration:</strong> Connect with wearable devices (Fitbit, Apple Watch) for holistic
+                health tracking.</li>
+            <li><strong>Doctor Dashboard:</strong> Enable healthcare professionals to monitor patient dietary patterns
+                using the DOCTOR role.</li>
+            <li><strong>Meal Planning:</strong> Generate complete daily/weekly meal plans based on nutritional goals and
+                preferences.</li>
+        </ul>
+    </div>
+
+    <!-- ==================== REFERENCES ==================== -->
+    <div class="page">
+        <h1>References</h1>
+        <ol style="line-height:2.2;margin-top:20px">
+            <li>Bossard, L., Guillaumin, M., & Van Gool, L. (2014). "Food-101 – Mining Discriminative Components with
+                Random Forests." <em>European Conference on Computer Vision (ECCV)</em>.</li>
+            <li>Dosovitskiy, A., et al. (2020). "An Image is Worth 16x16 Words: Transformers for Image Recognition at
+                Scale." <em>arXiv preprint arXiv:2010.11929</em>.</li>
+            <li>He, K., Zhang, X., Ren, S., & Sun, J. (2016). "Deep Residual Learning for Image Recognition." <em>IEEE
+                    Conference on Computer Vision and Pattern Recognition (CVPR)</em>.</li>
+            <li>USDA FoodData Central. U.S. Department of Agriculture. Available at: <em>https://fdc.nal.usda.gov/</em>
+            </li>
+            <li>Hugging Face Model Hub — nateraw/food. Available at: <em>https://huggingface.co/nateraw/food</em></li>
+            <li>Flask Web Framework Documentation. Available at: <em>https://flask.palletsprojects.com/</em></li>
+            <li>TensorFlow/Keras Documentation. Available at: <em>https://www.tensorflow.org/</em></li>
+            <li>Jones, M., Bradley, J., & Sakimura, N. (2015). "JSON Web Token (JWT)." <em>RFC 7519, IETF</em>.</li>
+            <li>SQLAlchemy Documentation. Available at: <em>https://www.sqlalchemy.org/</em></li>
+            <li>Meyers, A., et al. (2015). "Im2Calories: Towards an Automated Mobile Vision Food Diary." <em>IEEE
+                    International Conference on Computer Vision (ICCV)</em>.</li>
+        </ol>
+    </div>
+
+</body>
+
+</html>

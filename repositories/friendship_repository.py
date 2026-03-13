@@ -1,5 +1,7 @@
 from models.friendship import Friendship
+from models.friend_request import FriendRequest
 from extensions import db
+from datetime import datetime
 
 
 class FriendshipRepository:
@@ -37,3 +39,45 @@ class FriendshipRepository:
         Friendship.query.filter_by(user_id=user_id, friend_id=friend_id).delete()
         Friendship.query.filter_by(user_id=friend_id, friend_id=user_id).delete()
         db.session.commit()
+
+    @staticmethod
+    def get_pending_request_between(user_id, friend_id):
+        """Return pending request between two users, regardless of direction."""
+        return FriendRequest.query.filter(
+            FriendRequest.status == 'PENDING',
+            db.or_(
+                db.and_(FriendRequest.from_user_id == user_id, FriendRequest.to_user_id == friend_id),
+                db.and_(FriendRequest.from_user_id == friend_id, FriendRequest.to_user_id == user_id)
+            )
+        ).first()
+
+    @staticmethod
+    def create_friend_request(from_user_id, to_user_id):
+        request = FriendRequest(from_user_id=from_user_id, to_user_id=to_user_id, status='PENDING')
+        db.session.add(request)
+        db.session.commit()
+        return request
+
+    @staticmethod
+    def get_incoming_requests(user_id):
+        return FriendRequest.query.filter_by(to_user_id=user_id, status='PENDING').order_by(FriendRequest.created_at.desc()).all()
+
+    @staticmethod
+    def get_outgoing_requests(user_id):
+        return FriendRequest.query.filter_by(from_user_id=user_id, status='PENDING').order_by(FriendRequest.created_at.desc()).all()
+
+    @staticmethod
+    def accept_request(request_id, current_user_id):
+        request = FriendRequest.query.filter_by(id=request_id, to_user_id=current_user_id, status='PENDING').first()
+        if not request:
+            return None
+
+        already_friends = FriendshipRepository.are_friends(request.from_user_id, request.to_user_id)
+        if not already_friends:
+            db.session.add(Friendship(user_id=request.from_user_id, friend_id=request.to_user_id))
+            db.session.add(Friendship(user_id=request.to_user_id, friend_id=request.from_user_id))
+
+        request.status = 'ACCEPTED'
+        request.responded_at = datetime.utcnow()
+        db.session.commit()
+        return request

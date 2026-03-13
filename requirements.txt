@@ -106,3 +106,6 @@ webencodings==0.5.1
 Werkzeug==1.0.1
 widgetsnbextension==3.5.1
 wrapt==1.12.1
+pg8000
+gunicorn==21.2.0
+python-dotenv==1.2.2

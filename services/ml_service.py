@@ -96,6 +96,7 @@ class MLService:
                 ]
                 print(f"[ML] API-only result: {food_name} ({confidence*100:.1f}%)")
             else:
+                detailed_error = FoodRecognitionAPIService.last_error or 'Food recognition API is unavailable or returned no result.'
                 return {
                     'food_name': 'Unknown',
                     'confidence': 0.0,
@@ -109,7 +110,7 @@ class MLService:
                         'serving_size_g': 0
                     },
                     'calories': 0,
-                    'message': 'Food recognition API is unavailable or returned no result.',
+                    'message': detailed_error,
                     'recognition_source': 'none',
                     'nutrition_source': 'none',
                     'top_3': []

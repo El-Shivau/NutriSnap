@@ -10,7 +10,8 @@ class FoodRecognitionAPIService:
     Model: ViT fine-tuned on Food-101 dataset (101 classes).
     """
 
-    API_URL = 'https://api-inference.huggingface.co/models/nateraw/food'
+    API_URL = 'https://router.huggingface.co/hf-inference/models/nateraw/food'
+    last_error = None
 
     @staticmethod
     def recognize(image_path):
@@ -20,14 +21,21 @@ class FoodRecognitionAPIService:
         Or None if API is unavailable.
         """
         try:
+            FoodRecognitionAPIService.last_error = None
             # Read raw image bytes
             with open(image_path, 'rb') as f:
                 image_bytes = f.read()
 
             headers = {}
             hf_token = current_app.config.get('HF_API_TOKEN', '')
-            if hf_token:
-                headers['Authorization'] = f'Bearer {hf_token}'
+            if not hf_token:
+                FoodRecognitionAPIService.last_error = (
+                    'Missing HF_API_TOKEN. Add a valid Hugging Face token in Render environment variables.'
+                )
+                print(f"[FoodAPI] {FoodRecognitionAPIService.last_error}")
+                return None
+
+            headers['Authorization'] = f'Bearer {hf_token}'
 
             print(f"[FoodAPI] Sending image to Hugging Face (nateraw/food)...")
             response = requests.post(
@@ -50,16 +58,21 @@ class FoodRecognitionAPIService:
                 )
 
             if response.status_code != 200:
-                print(f"[FoodAPI] API returned {response.status_code}: {response.text[:200]}")
+                FoodRecognitionAPIService.last_error = (
+                    f"HuggingFace API error {response.status_code}: {response.text[:200]}"
+                )
+                print(f"[FoodAPI] {FoodRecognitionAPIService.last_error}")
                 return None
 
             data = response.json()
 
             if isinstance(data, dict) and 'error' in data:
+                FoodRecognitionAPIService.last_error = f"HuggingFace response error: {data['error']}"
                 print(f"[FoodAPI] Error: {data['error']}")
                 return None
 
             if not isinstance(data, list) or len(data) == 0:
+                FoodRecognitionAPIService.last_error = 'HuggingFace returned no predictions.'
                 print("[FoodAPI] No predictions returned")
                 return None
 
@@ -77,8 +90,10 @@ class FoodRecognitionAPIService:
             return results
 
         except requests.exceptions.Timeout:
+            FoodRecognitionAPIService.last_error = 'HuggingFace request timed out.'
             print("[FoodAPI] Request timed out")
             return None
         except Exception as e:
+            FoodRecognitionAPIService.last_error = f"HuggingFace request failed: {e}"
             print(f"[FoodAPI] Error: {e}")
             return None

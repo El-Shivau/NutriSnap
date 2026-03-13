@@ -9,25 +9,34 @@ from tensorflow.keras.preprocessing import image
 
 class MLService:
     model = None
+    model_load_error = None
     nutrition_table = {}
     label = []
     CONFIDENCE_THRESHOLD = 0.60  # 60% minimum confidence
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     @classmethod
     def initialize(cls):
         if cls.model is None:
             print("Loading ML Model...")
             tensorflow.keras.backend.clear_session()
-            model_path = os.path.join(os.getcwd(), 'best_model_101class.hdf5')
-            cls.model = load_model(model_path, compile=False)
-            print(f"Model loaded successfully. Input shape: {cls.model.input_shape}")
+            model_path = os.path.join(cls.BASE_DIR, 'best_model_101class.hdf5')
+            try:
+                cls.model = load_model(model_path, compile=False)
+                cls.model_load_error = None
+                print(f"Model loaded successfully. Input shape: {cls.model.input_shape}")
+            except Exception as error:
+                cls.model = None
+                cls.model_load_error = str(error)
+                print(f"[ML] Local model unavailable: {cls.model_load_error}")
+                print("[ML] Continuing with API-only recognition mode.")
 
             cls.load_nutrition_data()
             cls.load_labels()
 
     @classmethod
     def load_nutrition_data(cls):
-        csv_path = os.path.join(os.getcwd(), 'nutrition101.csv')
+        csv_path = os.path.join(cls.BASE_DIR, 'nutrition101.csv')
         with open(csv_path, 'r') as file:
             reader = csv.reader(file)
             for i, row in enumerate(reader):
@@ -162,6 +171,21 @@ class MLService:
 
         # --- Fallback to local model ---
         if food_name is None:
+            if cls.model is None:
+                print("[ML] Local model not available and API did not return a confident result.")
+                return {
+                    'food_name': 'Unknown',
+                    'confidence': 0.0,
+                    'low_confidence': True,
+                    'nutrition': {'protein': 0, 'carbohydrates': 0, 'fat': 0,
+                                  'fiber': 0, 'sugar': 0, 'serving_size_g': 0},
+                    'calories': 0,
+                    'message': 'Food model is not available on server. Configure MODEL_PATH or deploy model file.',
+                    'recognition_source': 'none',
+                    'nutrition_source': 'none',
+                    'top_3': []
+                }
+
             print("[ML] Using local model...")
             img = image.load_img(image_path, target_size=(200, 200), color_mode='rgb')
             img_array = image.img_to_array(img)

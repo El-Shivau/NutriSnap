@@ -13,3 +13,8 @@ class Config:
     # Hugging Face (optional) — works without key, but key gives higher rate limits
     # Get a free token at https://huggingface.co/settings/tokens
     HF_API_TOKEN = os.environ.get('HF_API_TOKEN') or ''
+
+    # BiteAI (preferred if configured)
+    BITEAI_API_URL = os.environ.get('BITEAI_API_URL') or ''
+    BITEAI_API_KEY = os.environ.get('BITEAI_API_KEY') or ''
+    FOOD_RECOGNITION_PROVIDER = os.environ.get('FOOD_RECOGNITION_PROVIDER') or 'biteai'

@@ -82,21 +82,41 @@ class MLService:
         recognition_source = 'none'
 
         try:
+            from flask import current_app
+            from services.bite_ai_service import BiteAIService
             from services.food_recognition_api_service import FoodRecognitionAPIService
-            api_predictions = FoodRecognitionAPIService.recognize(image_path)
+
+            provider = (current_app.config.get('FOOD_RECOGNITION_PROVIDER', 'biteai') or 'biteai').lower()
+            api_predictions = None
+            error_messages = []
+
+            if provider in ('biteai', 'auto'):
+                api_predictions = BiteAIService.recognize(image_path)
+                if api_predictions:
+                    recognition_source = 'biteai_api'
+                elif BiteAIService.last_error:
+                    error_messages.append(BiteAIService.last_error)
+
+            if not api_predictions and provider in ('huggingface', 'auto', 'biteai'):
+                api_predictions = FoodRecognitionAPIService.recognize(image_path)
+                if api_predictions:
+                    recognition_source = 'huggingface_api'
+                elif FoodRecognitionAPIService.last_error:
+                    error_messages.append(FoodRecognitionAPIService.last_error)
 
             if api_predictions and len(api_predictions) > 0:
                 best = api_predictions[0]
                 food_name = best['name']
                 confidence = best['confidence']
-                recognition_source = 'huggingface_api'
+                if recognition_source == 'none':
+                    recognition_source = 'api'
                 top_3 = [
                     {'name': p['name'], 'prob': p['confidence']}
                     for p in api_predictions[:3]
                 ]
                 print(f"[ML] API-only result: {food_name} ({confidence*100:.1f}%)")
             else:
-                detailed_error = FoodRecognitionAPIService.last_error or 'Food recognition API is unavailable or returned no result.'
+                detailed_error = ' | '.join(error_messages).strip() or 'Food recognition API is unavailable or returned no result.'
                 return {
                     'food_name': 'Unknown',
                     'confidence': 0.0,

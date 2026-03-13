@@ -176,7 +176,17 @@ class MLService:
                     ]
                     print(f"[ML] Using HuggingFace API result: {food_name} ({confidence*100:.1f}%)")
                 else:
-                    print(f"[ML] API top result below threshold: {best['name']} ({best['confidence']*100:.1f}%)")
+                    if cls.model is None:
+                        food_name = best['name']
+                        confidence = best['confidence']
+                        recognition_source = 'huggingface_api_low_confidence'
+                        top_3 = [
+                            {'name': p['name'], 'prob': p['confidence']}
+                            for p in api_predictions[:3]
+                        ]
+                        print(f"[ML] Using API fallback result (local model unavailable): {food_name} ({confidence*100:.1f}%)")
+                    else:
+                        print(f"[ML] API top result below threshold: {best['name']} ({best['confidence']*100:.1f}%)")
         except Exception as e:
             print(f"[ML] HuggingFace API failed: {e}")
 
@@ -240,7 +250,11 @@ class MLService:
                 print(f"  #{rank}: {cls.label[idx]} ({pred[0][idx]*100:.1f}%)")
 
         # --- Confidence Check ---
-        if confidence < cls.CONFIDENCE_THRESHOLD:
+        enforce_threshold = not (
+            cls.model is None and recognition_source in ('huggingface_api_low_confidence', 'huggingface_api')
+        )
+
+        if confidence < cls.CONFIDENCE_THRESHOLD and enforce_threshold:
             print(f"[ML] Low confidence: {confidence*100:.1f}%")
             return {
                 'food_name': food_name,

@@ -2,9 +2,17 @@ import os
 import csv
 import math
 import numpy as np
-import tensorflow
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+try:
+    import tensorflow
+    from tensorflow.keras.models import load_model
+    from tensorflow.keras.preprocessing import image
+    TF_AVAILABLE = True
+except Exception as error:
+    tensorflow = None
+    load_model = None
+    image = None
+    TF_AVAILABLE = False
+    TF_IMPORT_ERROR = str(error)
 
 
 class MLService:
@@ -19,9 +27,12 @@ class MLService:
     def initialize(cls):
         if cls.model is None:
             print("Loading ML Model...")
-            tensorflow.keras.backend.clear_session()
+            if TF_AVAILABLE:
+                tensorflow.keras.backend.clear_session()
             model_path = os.path.join(cls.BASE_DIR, 'best_model_101class.hdf5')
             try:
+                if not TF_AVAILABLE:
+                    raise RuntimeError(f"TensorFlow unavailable: {TF_IMPORT_ERROR}")
                 cls.model = load_model(model_path, compile=False)
                 cls.model_load_error = None
                 print(f"Model loaded successfully. Input shape: {cls.model.input_shape}")

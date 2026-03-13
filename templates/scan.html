@@ -286,7 +286,12 @@
                 body: formData
             });
 
-            const data = await res.json();
+            let data = {};
+            try {
+                data = await res.json();
+            } catch (_) {
+                data = {};
+            }
             loading.classList.add('d-none');
 
             if (res.ok) {
@@ -363,7 +368,8 @@
                     document.getElementById('log-hint').style.display = 'block';
                 }
             } else {
-                alert(data.error || 'Analysis failed');
+                const detail = data.error || data.message || `Analysis failed (HTTP ${res.status})`;
+                alert(detail);
                 resetScan();
             }
         } catch (e) {

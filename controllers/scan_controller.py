@@ -34,7 +34,9 @@ def scan_image(current_user):
             # Just return the result — user decides whether to log it
             return jsonify(result)
         except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            current_app.logger.exception("Scan analysis failed")
+            err_msg = str(e).strip() or 'Unexpected analysis error'
+            return jsonify({'error': f"{type(e).__name__}: {err_msg}"}), 500
 
 
 @scan_bp.route('/api/log', methods=['POST'])

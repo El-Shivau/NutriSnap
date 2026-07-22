@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction Results{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in-up" style="max-width: 720px;">
+    <h1 class="h3 fw-bold text-white mb-4">
+        <i class="bi bi-cpu text-success me-2"></i>Prediction Results
+    </h1>
+
+    <!-- Prediction result — populated dynamically in Phase 7 -->
+    <div class="prediction-card mb-4" id="prediction-result">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div>
+                <h2 class="h4 fw-bold text-white mb-1" id="predicted-food-name">—</h2>
+                <p class="text-secondary small mb-0">Top prediction</p>
+            </div>
+        </div>
+
+        <!-- Confidence Bar -->
+        <p class="text-secondary small mb-1">Confidence</p>
+        <div class="confidence-bar mb-1">
+            <div class="confidence-fill" id="confidence-fill" style="width: 0%;"></div>
+        </div>
+        <p class="text-end small text-success fw-semibold" id="confidence-pct">—%</p>
+    </div>
+
+    <!-- Nutritional Info — populated in Phase 7 -->
+    <div class="mb-4">
+        <h3 class="h5 fw-semibold text-white mb-3">Nutritional Information</h3>
+        <div class="row g-3">
+            <div class="col-6 col-md-4">
+                <div class="nutrient-badge">
+                    <div class="value" id="nut-calories">—</div>
+                    <div class="label">Calories</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="nutrient-badge">
+                    <div class="value" id="nut-protein">—g</div>
+                    <div class="label">Protein</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="nutrient-badge">
+                    <div class="value" id="nut-fat">—g</div>
+                    <div class="label">Fat</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="nutrient-badge">
+                    <div class="value" id="nut-carbs">—g</div>
+                    <div class="label">Carbohydrates</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="nutrient-badge">
+                    <div class="value" id="nut-fiber">—g</div>
+                    <div class="label">Fiber</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="nutrient-badge">
+                    <div class="value" id="nut-serving">—g</div>
+                    <div class="label">Serving Size</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm & Log -->
+    <form method="POST" action="{{ url_for('food.log_food') }}" id="log-food-form">
+        <input type="hidden" name="food_name" id="hidden-food-name">
+        <input type="hidden" name="confidence" id="hidden-confidence">
+        <div class="mb-3">
+            <label for="log-notes" class="form-label">Notes (optional)</label>
+            <input type="text" class="form-control" id="log-notes" name="notes"
+                   placeholder="e.g. lunch at home">
+        </div>
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-success flex-grow-1 py-2"
+                    id="confirm-log-btn">
+                <i class="bi bi-check2-circle me-2"></i>Confirm &amp; Save to Log
+            </button>
+            <a href="{{ url_for('food.upload') }}" class="btn btn-outline-secondary"
+               id="try-again-btn">
+                Try Again
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

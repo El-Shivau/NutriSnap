@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in-up" style="max-width: 640px;">
+    <h1 class="h3 fw-bold text-white mb-4">
+        <i class="bi bi-person-circle text-success me-2"></i>My Profile
+    </h1>
+
+    <!-- Profile form — implemented in Phase 6 -->
+    <div class="prediction-card">
+        <form method="POST" action="{{ url_for('dashboard.profile') }}" id="profile-form">
+
+            <!-- Username -->
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username"
+                       placeholder="Your username" value="">
+            </div>
+
+            <!-- Email (read-only for now) -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email"
+                       placeholder="Your email" readonly
+                       style="cursor: not-allowed; opacity: 0.7;">
+                <div class="form-text text-secondary" style="font-size: 0.75rem;">
+                    Email cannot be changed.
+                </div>
+            </div>
+
+            <!-- Bio -->
+            <div class="mb-4">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" name="bio" rows="3"
+                          placeholder="Tell us about yourself..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success" id="save-profile-btn">
+                <i class="bi bi-floppy me-2"></i>Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

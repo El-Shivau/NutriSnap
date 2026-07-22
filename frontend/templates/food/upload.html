@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Food Image{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in-up" style="max-width: 640px;">
+    <div class="text-center mb-4">
+        <h1 class="h3 fw-bold text-white">Upload a Food Photo</h1>
+        <p class="text-secondary">Our AI will identify the food and show its nutritional info.</p>
+    </div>
+
+    <!-- Upload Form — implemented in Phase 7 -->
+    <form method="POST" action="{{ url_for('food.upload') }}"
+          enctype="multipart/form-data" id="upload-form">
+
+        <!-- Upload Zone -->
+        <div class="upload-zone mb-4" id="upload-zone" role="button"
+             aria-label="Click or drag and drop to upload a food image">
+            <i class="bi bi-cloud-arrow-up-fill d-block mb-3"></i>
+            <p class="fw-semibold text-white mb-1">Drag & drop your image here</p>
+            <p class="text-secondary small mb-0" id="upload-zone-label">
+                or click to browse (PNG, JPG, JPEG, WebP · max 16 MB)
+            </p>
+            <!-- Hidden file input -->
+            <input type="file" id="food-image-input" name="food_image"
+                   accept=".png,.jpg,.jpeg,.webp" class="d-none" required>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-success btn-lg" id="upload-submit-btn">
+                <i class="bi bi-search me-2"></i>Analyse Food
+            </button>
+        </div>
+    </form>
+
+    <p class="text-center text-secondary small mt-4">
+        <i class="bi bi-info-circle me-1"></i>
+        NutriSnap recognises 101 food types from the Food-101 dataset.
+    </p>
+</div>
+{% endblock %}

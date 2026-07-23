@@ -236,6 +236,7 @@ class Predictor:
             If the model fails to make a prediction.
         """
         import torch
+        torch.set_num_threads(1)  # Force 1 thread to prevent memory spikes on small servers
 
         # Load model on first call
         if self._model is None:
@@ -265,11 +266,15 @@ class Predictor:
                 "display_name": _class_name_to_display(food_name),
                 "confidence": float(prob),
             })
-
-        best = top_k_results[0]
-        return {
-            "food_name": best["food_name"],
-            "display_name": best["display_name"],
-            "confidence": best["confidence"],
-            "top_k": top_k_results,
-        }
+        
+        try:
+            best = top_k_results[0]
+            return {
+                "food_name": best["food_name"],
+                "display_name": best["display_name"],
+                "confidence": best["confidence"],
+                "top_k": top_k_results,
+            }
+        finally:
+            import gc
+            gc.collect()

@@ -35,6 +35,8 @@ def init_db_command():
     except Exception as e:
         logger.error(f"Failed to create tables: {e}")
         click.echo(f"Error creating tables: {e}", err=True)
+
+@click.command("clean-old-images")
 @with_appcontext
 def clean_old_images_command():
     """

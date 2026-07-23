@@ -99,6 +99,12 @@ def create_app(config_name: str | None = None) -> Flask:
     # -------------------------------------------------------------------------
     _register_user_loader()
 
+    # -------------------------------------------------------------------------
+    # Register custom CLI commands
+    # -------------------------------------------------------------------------
+    from backend.cli import register_cli_commands
+    register_cli_commands(app)
+
     app.logger.info("NutriSnap application started in '%s' mode.", config_name)
 
     return app

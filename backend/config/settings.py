@@ -56,10 +56,11 @@ class Config:
     }
 
     # -------------------------------------------------------------------------
-    # Machine Learning
+    # Machine Learning & App Limits
     # -------------------------------------------------------------------------
     MODEL_PATH: str = os.environ.get("MODEL_PATH", "ml/models/food101_v1.keras")
     TOP_K_PREDICTIONS: int = int(os.environ.get("TOP_K_PREDICTIONS", 3))
+    MAX_DAILY_LOGS: int = int(os.environ.get("MAX_DAILY_LOGS", 20))
 
     # -------------------------------------------------------------------------
     # Security

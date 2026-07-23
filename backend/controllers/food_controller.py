@@ -238,6 +238,14 @@ def log_food():
         flash("Session mismatch. Please scan a new image.", "warning")
         return redirect(url_for("food.upload"))
 
+    # Enforce Daily Logging Limit
+    from flask import current_app
+    today_summary = _food_service.get_today_summary(current_user.id)
+    max_logs = current_app.config.get("MAX_DAILY_LOGS", 20)
+    if today_summary["log_count"] >= max_logs:
+        flash(f"You have reached your daily limit of {max_logs} logged meals.", "warning")
+        return redirect(url_for("dashboard.dashboard"))
+
     notes = request.form.get("notes", "").strip() or None
 
     try:

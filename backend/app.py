@@ -109,10 +109,14 @@ def _register_blueprints(app: Flask) -> None:
     from backend.controllers.auth_controller import auth_bp
     from backend.controllers.dashboard_controller import dashboard_bp
     from backend.controllers.food_controller import food_bp
+    from backend.controllers.friends_controller import friends_bp
+    from backend.controllers.leaderboard_controller import leaderboard_bp
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(food_bp, url_prefix="/food")
-    app.register_blueprint(dashboard_bp)  # Handles '/' and '/dashboard'
+    app.register_blueprint(dashboard_bp)          # handles '/' and '/dashboard'
+    app.register_blueprint(friends_bp)            # url_prefix set on the blueprint
+    app.register_blueprint(leaderboard_bp)        # url_prefix set on the blueprint
 
 
 def _register_user_loader() -> None:

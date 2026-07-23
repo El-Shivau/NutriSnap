@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Find Friends{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in-up" style="max-width:680px;">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('friends.friends_list') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h1 class="h3 fw-bold text-white mb-0">Find Friends</h1>
+            <p class="text-secondary small mb-0">Search by username</p>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <form method="GET" action="{{ url_for('friends.search') }}" id="friend-search-form" class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="friend-search-input"
+                   name="q" value="{{ query }}"
+                   placeholder="Search username…"
+                   autocomplete="off" autofocus
+                   minlength="2" maxlength="80">
+            <button type="submit" class="btn btn-success" id="friend-search-btn">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+        <div class="form-text text-secondary" style="font-size:0.75rem;">
+            Type at least 2 characters
+        </div>
+    </form>
+
+    <!-- Results -->
+    {% if query %}
+        {% if results %}
+        <div class="d-flex flex-column gap-2" id="search-results">
+            {% for item in results %}
+            <div class="prediction-card p-3 d-flex align-items-center gap-3">
+                <!-- Avatar -->
+                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-success flex-shrink-0"
+                     style="width:42px;height:42px;background:rgba(16,185,129,0.15);font-size:1rem;">
+                    {{ item.user.username[0].upper() }}
+                </div>
+
+                <!-- Info -->
+                <div class="flex-grow-1">
+                    <div class="fw-semibold text-white small">{{ item.user.username }}</div>
+                    {% if item.user.bio %}
+                    <div class="text-secondary" style="font-size:0.72rem;">
+                        {{ item.user.bio[:60] }}{% if item.user.bio | length > 60 %}…{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Action -->
+                <div class="flex-shrink-0">
+                    {% if item.status == 'accepted' %}
+                        <span class="badge bg-success bg-opacity-20 text-success">
+                            <i class="bi bi-check2"></i> Friends
+                        </span>
+
+                    {% elif item.status == 'pending' and item.is_requester %}
+                        <!-- Current user sent the request -->
+                        <form method="POST" action="{{ url_for('friends.cancel_request', addressee_id=item.user.id) }}">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                Cancel Request
+                            </button>
+                        </form>
+
+                    {% elif item.status == 'pending' and not item.is_requester %}
+                        <!-- Other user sent to current user -->
+                        <form method="POST" action="{{ url_for('friends.accept_request', requester_id=item.user.id) }}">
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="bi bi-check-lg me-1"></i>Accept
+                            </button>
+                        </form>
+
+                    {% elif item.status == 'blocked' %}
+                        <span class="badge bg-secondary bg-opacity-20 text-secondary">Blocked</span>
+
+                    {% else %}
+                        <!-- No relationship -->
+                        <form method="POST" action="{{ url_for('friends.send_request', addressee_id=item.user.id) }}">
+                            <button type="submit" class="btn btn-success btn-sm" id="add-friend-{{ item.user.id }}">
+                                <i class="bi bi-person-plus me-1"></i>Add Friend
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="prediction-card p-5 text-center text-secondary">
+            <i class="bi bi-person-x" style="font-size:2.5rem;opacity:0.3;"></i>
+            <p class="mt-3 mb-0 small">No users found for "<strong>{{ query }}</strong>".</p>
+        </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -41,6 +41,10 @@ class Config:
     # -------------------------------------------------------------------------
     SQLALCHEMY_DATABASE_URI: str = os.environ.get("DATABASE_URL", "sqlite:///nutrisnap.db")
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False  # Suppress deprecation warning
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,  # Recycle connections before they are dropped by Supabase/PgBouncer
+    }
 
     # -------------------------------------------------------------------------
     # File Upload

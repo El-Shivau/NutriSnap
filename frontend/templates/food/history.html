@@ -4,39 +4,111 @@
 
 {% block content %}
 <div class="container py-4 fade-in-up">
+
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 fw-bold text-white mb-0">
-            <i class="bi bi-clock-history text-success me-2"></i>Food History
-        </h1>
-        <a href="{{ url_for('food.upload') }}" class="btn btn-success btn-sm"
-           id="history-upload-btn">
+        <div>
+            <h1 class="h3 fw-bold text-white mb-0">
+                <i class="bi bi-clock-history text-success me-2"></i>Food History
+            </h1>
+            <p class="text-secondary small mb-0">All your logged meals</p>
+        </div>
+        <a href="{{ url_for('food.upload') }}" class="btn btn-success btn-sm" id="history-upload-btn">
             <i class="bi bi-plus me-1"></i>Log More
         </a>
     </div>
 
-    <!-- History Table — populated in Phase 6/7 -->
+    <!-- Today's Summary -->
+    {% if today_summary %}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value">{{ today_summary.total_calories | round(0) | int }}</div>
+                <div class="stat-label">kcal Today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value">{{ today_summary.total_protein_g | round(1) }}g</div>
+                <div class="stat-label">Protein</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value">{{ today_summary.total_carbs_g | round(1) }}g</div>
+                <div class="stat-label">Carbs</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value">{{ today_summary.total_fat_g | round(1) }}g</div>
+                <div class="stat-label">Fat</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- History Table -->
     <div class="food-log-table">
         <table class="table mb-0" id="history-table">
             <thead>
                 <tr>
                     <th>Food</th>
-                    <th>Calories</th>
-                    <th>Protein</th>
-                    <th>Carbs</th>
-                    <th>Fat</th>
-                    <th>Confidence</th>
+                    <th class="d-none d-md-table-cell">Calories</th>
+                    <th class="d-none d-md-table-cell">Protein</th>
+                    <th class="d-none d-md-table-cell">Carbs</th>
+                    <th class="d-none d-md-table-cell">Fat</th>
+                    <th>AI Score</th>
                     <th>Date</th>
                 </tr>
             </thead>
             <tbody id="history-table-body">
-                <tr>
-                    <td colspan="7" class="text-center text-secondary py-5">
-                        <i class="bi bi-journal-x" style="font-size: 2rem; opacity: 0.4;"></i>
-                        <p class="mt-2 mb-0 small">No history yet. <a href="{{ url_for('food.upload') }}">Upload your first meal!</a></p>
-                    </td>
-                </tr>
+                {% if logs %}
+                    {% for log in logs %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if log.image_filename %}
+                                <img src="{{ url_for('food.uploaded_file', filename=log.image_filename) }}"
+                                     onerror="this.style.display='none'"
+                                     alt="{{ log.display_name }}"
+                                     style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;">
+                                {% else %}
+                                <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="bi bi-egg-fried text-success" style="font-size:1rem;"></i>
+                                </div>
+                                {% endif %}
+                                <span class="fw-semibold text-white">{{ log.display_name }}</span>
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell text-secondary">{{ log.calories | round(0) | int }} kcal</td>
+                        <td class="d-none d-md-table-cell text-secondary">{{ log.protein_g | round(1) }}g</td>
+                        <td class="d-none d-md-table-cell text-secondary">{{ log.carbs_g | round(1) }}g</td>
+                        <td class="d-none d-md-table-cell text-secondary">{{ log.fat_g | round(1) }}g</td>
+                        <td>
+                            <span class="badge {% if log.confidence >= 80 %}bg-success{% elif log.confidence >= 50 %}bg-warning text-dark{% else %}bg-secondary{% endif %} bg-opacity-25 text-success small">
+                                {{ log.confidence | round(1) }}%
+                            </span>
+                        </td>
+                        <td class="text-secondary small">
+                            {{ log.logged_at[:10] if log.logged_at else '—' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-secondary py-5">
+                            <i class="bi bi-journal-x" style="font-size: 2rem; opacity: 0.4;"></i>
+                            <p class="mt-2 mb-0 small">
+                                No history yet.
+                                <a href="{{ url_for('food.upload') }}">Upload your first meal!</a>
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
+
 </div>
 {% endblock %}

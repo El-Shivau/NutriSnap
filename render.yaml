@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: nutrisnap
+    runtime: python
+    plan: free
+
+    # Build: install deps then download the ML model
+    buildCommand: |
+      pip install -r requirements.txt
+      python scripts/download_model.py
+
+    # Start: use gunicorn to serve Flask
+    startCommand: gunicorn "backend.wsgi:app" --workers 2 --timeout 120 --bind 0.0.0.0:$PORT
+
+    # Health check endpoint
+    healthCheckPath: /
+
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: LOG_LEVEL
+        value: INFO
+      # Set these in the Render dashboard (do NOT commit actual values):
+      # - key: DATABASE_URL
+      #   value: postgresql://...  (your Supabase connection string)
+      # - key: MODEL_DOWNLOAD_URL
+      #   value: https://github.com/YOUR_USERNAME/NutriSnap/releases/download/v1.0/food101_v1.keras
+      # - key: MODEL_PATH
+      #   value: ml/models/food101_v1.keras

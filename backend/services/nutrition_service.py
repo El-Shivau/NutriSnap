@@ -47,8 +47,11 @@ class NutritionService:
             Nutritional data as a dictionary, or None if the food is not
             found in the database.
         """
-        # TODO: Implement in Phase 5
-        raise NotImplementedError("NutritionService.get_by_food_name() — implemented in Phase 5")
+        record = self.nutrition_repo.find_by_food_name(food_name)
+        if record is None:
+            logger.warning("No nutrition data found for: %s", food_name)
+            return None
+        return record.to_dict()
 
     def get_all_foods(self) -> list[dict]:
         """
@@ -59,5 +62,5 @@ class NutritionService:
         list[dict]
             A list of nutritional dictionaries, one per food class.
         """
-        # TODO: Implement in Phase 5
-        raise NotImplementedError("NutritionService.get_all_foods() — implemented in Phase 5")
+        records = self.nutrition_repo.find_all()
+        return [r.to_dict() for r in records]

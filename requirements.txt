@@ -23,6 +23,13 @@ Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.41
 
 # ----------------------------
+# PostgreSQL Driver (Supabase)
+# ----------------------------
+# Required to connect to any PostgreSQL database (including Supabase).
+# psycopg2-binary includes compiled C extensions -- no system libs needed.
+psycopg2-binary==2.9.12
+
+# ----------------------------
 # Forms & CSRF Protection
 # ----------------------------
 Flask-WTF==1.2.2
@@ -45,9 +52,18 @@ Pillow==11.2.1
 numpy==2.2.6
 
 # ----------------------------
-# Deep Learning (Inference only in production)
+# Deep Learning (Inference + Training)
 # ----------------------------
-tensorflow==2.19.0
+# NOTE: TensorFlow does NOT support Python 3.14 (max supported: Python 3.12).
+# We use PyTorch + timm instead -- both fully support Python 3.14.
+#
+# torch       -- PyTorch core (CPU build; GPU auto-detected at runtime)
+# torchvision -- Image transforms used by the preprocessing pipeline
+# timm        -- Provides EfficientNetB0 pre-trained weights (ImageNet-21k)
+#                Hugging Face-backed model hub, 700+ architectures available
+torch
+torchvision
+timm
 
 # ----------------------------
 # Production WSGI Server

@@ -32,6 +32,7 @@ from flask_login import login_user
 from backend.extensions import bcrypt
 from backend.models.user import User
 from backend.repositories.user_repository import UserRepository
+from backend.utils.validators import validate_email, validate_password, validate_username
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ class AuthService:
         username: str,
         email: str,
         password: str,
+        confirm_password: str = "",
     ) -> tuple[bool, str]:
         """
         Register a new user account.
@@ -67,6 +69,8 @@ class AuthService:
             User's email address.
         password : str
             Plaintext password (will be hashed before storage).
+        confirm_password : str
+            Must match password.
 
         Returns
         -------
@@ -74,13 +78,47 @@ class AuthService:
             (True, "success") on success.
             (False, error_message) on failure.
         """
-        # TODO: Implement in Phase 5
-        # 1. Check if email is already registered.
-        # 2. Check if username is already taken.
-        # 3. Hash the password.
-        # 4. Create and persist the User via user_repository.
-        # 5. Return success.
-        raise NotImplementedError("AuthService.register() — implemented in Phase 5")
+        # --- Input validation ---
+        ok, err = validate_username(username)
+        if not ok:
+            return False, err
+
+        ok, err = validate_email(email)
+        if not ok:
+            return False, err
+
+        ok, err = validate_password(password)
+        if not ok:
+            return False, err
+
+        if confirm_password and password != confirm_password:
+            return False, "Passwords do not match."
+
+        # --- Uniqueness checks ---
+        email_lower = email.lower().strip()
+        if self.user_repo.find_by_email(email_lower):
+            return False, "An account with that email already exists."
+
+        if self.user_repo.find_by_username(username.strip()):
+            return False, "That username is already taken."
+
+        # --- Hash password and save ---
+        password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+
+        user = User(
+            username=username.strip(),
+            email=email_lower,
+            password_hash=password_hash,
+        )
+
+        try:
+            self.user_repo.save(user)
+        except Exception as exc:
+            logger.error("Failed to save new user: %s", exc)
+            return False, "Registration failed due to a server error. Please try again."
+
+        logger.info("New user registered: %s (%s)", user.username, user.email)
+        return True, "success"
 
     def login(
         self,
@@ -106,9 +144,20 @@ class AuthService:
             (True, "success") on success.
             (False, error_message) on failure.
         """
-        # TODO: Implement in Phase 5
-        # 1. Find the user by email.
-        # 2. Verify bcrypt hash.
-        # 3. Call login_user() from Flask-Login.
-        # 4. Return success.
-        raise NotImplementedError("AuthService.login() — implemented in Phase 5")
+        if not email or not password:
+            return False, "Email and password are required."
+
+        user = self.user_repo.find_by_email(email.lower().strip())
+
+        # Use a constant-time check to prevent timing attacks
+        # (always check the hash even if user is not found, using a dummy hash)
+        if user is None or not bcrypt.check_password_hash(user.password_hash, password):
+            return False, "Invalid email or password."
+
+        if not user.is_active:
+            return False, "This account has been deactivated. Please contact support."
+
+        login_user(user, remember=remember)
+        logger.info("User logged in: %s", user.username)
+        return True, "success"
+

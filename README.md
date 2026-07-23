@@ -199,7 +199,7 @@ This project is for educational purposes. Feel free to use it as a reference or 
 
 ## 👥 Authors
 
-- **Your Name** — *Full-stack development & ML pipeline*
+- **Jeel Gadhia and Tapan Joshi** — *Full-stack development & ML pipeline*
 
 ---
 

@@ -90,3 +90,17 @@ class FoodLogRepository:
         db.session.delete(food_log)
         db.session.commit()
         logger.debug("Deleted food log id=%d", food_log.id)
+
+    def user_owns_image(self, user_id: int, filename: str) -> bool:
+        """
+        Return True if at least one of this user's food logs references
+        the given image filename.
+
+        Used by the uploaded_file route to enforce owner-only access —
+        even if an attacker guesses the UUID filename they get a 404.
+        """
+        return (
+            FoodLog.query.filter_by(user_id=user_id, image_filename=filename).first()
+            is not None
+        )
+

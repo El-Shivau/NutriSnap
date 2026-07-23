@@ -3,25 +3,27 @@ Image Preprocessing Module
 ===========================
 
 This module provides image preprocessing utilities for the NutriSnap
-food recognition pipeline.
+food recognition pipeline using PyTorch + torchvision.
 
 It is used in TWO places:
   1. During training   : ml/training/train.py
   2. During inference  : ml/inference/predictor.py
 
-Having a single shared preprocessing module is critical — the EXACT
+Having a single shared preprocessing module is critical -- the EXACT
 same transformations applied during training MUST be applied at
 inference time. Any mismatch will cause the model to produce
 incorrect predictions.
 
-EfficientNetB0 Input Requirements
-----------------------------------
-- Image size  : 224 × 224 pixels
-- Pixel range : The raw [0, 255] uint8 values (EfficientNet includes
-                its own internal rescaling via tf.keras.applications.efficientnet.preprocess_input)
-- Channel order: RGB (Pillow and TensorFlow both use RGB by default)
+EfficientNetB0 (timm) Input Requirements
+-----------------------------------------
+- Image size  : 224 x 224 pixels
+- Pixel range : [0.0, 1.0] float32
+- Normalisation: mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+  (ImageNet statistics used by all timm models)
+- Channel order: RGB
 """
 
+import io
 import logging
 from pathlib import Path
 from typing import Union
@@ -31,8 +33,12 @@ from PIL import Image
 
 logger = logging.getLogger(__name__)
 
-# EfficientNetB0 expects 224×224 images
+# EfficientNetB0 (timm default) expects 224x224 images
 TARGET_SIZE: tuple[int, int] = (224, 224)
+
+# ImageNet normalisation constants (used by all timm pretrained models)
+IMAGENET_MEAN = [0.485, 0.456, 0.406]
+IMAGENET_STD  = [0.229, 0.224, 0.225]
 
 
 def load_image(image_source: Union[str, Path, bytes]) -> Image.Image:
@@ -43,7 +49,7 @@ def load_image(image_source: Union[str, Path, bytes]) -> Image.Image:
     ----------
     image_source : str | Path | bytes
         Either a file path (string or Path object) or raw image bytes
-        (e.g. from an HTTP request).
+        (e.g. from an HTTP multipart upload).
 
     Returns
     -------
@@ -57,19 +63,26 @@ def load_image(image_source: Union[str, Path, bytes]) -> Image.Image:
     ValueError
         If the image cannot be opened or is not a valid image format.
     """
-    # TODO: Implement in Phase 2
-    # 1. If bytes → wrap in io.BytesIO and open with PIL.
-    # 2. If path → verify it exists and open with PIL.
-    # 3. Convert to RGB (handles RGBA, grayscale, etc.).
-    raise NotImplementedError("load_image() — implemented in Phase 2")
+    try:
+        if isinstance(image_source, bytes):
+            image = Image.open(io.BytesIO(image_source))
+        else:
+            path = Path(image_source)
+            if not path.exists():
+                raise FileNotFoundError(f"Image file not found: {path}")
+            image = Image.open(path)
+
+        return image.convert("RGB")
+
+    except FileNotFoundError:
+        raise
+    except Exception as exc:
+        raise ValueError(f"Failed to load image: {exc}") from exc
 
 
 def resize_image(image: Image.Image, size: tuple[int, int] = TARGET_SIZE) -> Image.Image:
     """
     Resize an image to the target dimensions using LANCZOS resampling.
-
-    LANCZOS (also called Lanczos3) provides the best quality for
-    downscaling and is preferred over simpler methods like BILINEAR.
 
     Parameters
     ----------
@@ -83,19 +96,15 @@ def resize_image(image: Image.Image, size: tuple[int, int] = TARGET_SIZE) -> Ima
     PIL.Image.Image
         Resized image.
     """
-    # TODO: Implement in Phase 2
-    raise NotImplementedError("resize_image() — implemented in Phase 2")
+    return image.resize(size, Image.LANCZOS)
 
 
 def image_to_array(image: Image.Image) -> np.ndarray:
     """
     Convert a PIL Image to a NumPy array.
 
-    The output shape is (224, 224, 3) — height × width × channels.
+    The output shape is (224, 224, 3) -- height x width x channels.
     Pixel values are in the range [0, 255] as uint8.
-
-    EfficientNet's preprocess_input() is applied separately in
-    preprocess_image() to keep responsibilities single.
 
     Parameters
     ----------
@@ -107,26 +116,23 @@ def image_to_array(image: Image.Image) -> np.ndarray:
     np.ndarray
         Array of shape (224, 224, 3) with dtype uint8.
     """
-    # TODO: Implement in Phase 2
-    raise NotImplementedError("image_to_array() — implemented in Phase 2")
+    return np.array(image, dtype=np.uint8)
 
 
 def preprocess_image(
     image_source: Union[str, Path, bytes],
     target_size: tuple[int, int] = TARGET_SIZE,
-) -> np.ndarray:
+) -> "torch.Tensor":
     """
     Full preprocessing pipeline for a single image.
 
-    This is the main entry point used by both the training pipeline
-    and the inference predictor. Steps:
-
+    Steps:
     1. Load the image (from path or bytes).
     2. Convert to RGB.
-    3. Resize to target_size.
-    4. Convert to NumPy array (shape: H×W×3).
-    5. Apply EfficientNet-specific normalisation.
-    6. Add batch dimension (shape: 1×H×W×3).
+    3. Resize to target_size using LANCZOS.
+    4. Normalise to [0, 1] float32.
+    5. Apply ImageNet mean/std normalisation.
+    6. Add batch dimension -> shape (1, 3, H, W).
 
     Parameters
     ----------
@@ -137,15 +143,25 @@ def preprocess_image(
 
     Returns
     -------
-    np.ndarray
-        Preprocessed array of shape (1, 224, 224, 3), ready for
-        model.predict().
+    torch.Tensor
+        Preprocessed tensor of shape (1, 3, 224, 224), ready for
+        model.forward().
 
     Example
     -------
     >>> tensor = preprocess_image("images/pizza.jpg")
     >>> tensor.shape
-    (1, 224, 224, 3)
+    torch.Size([1, 3, 224, 224])
     """
-    # TODO: Implement in Phase 2 using the helper functions above
-    raise NotImplementedError("preprocess_image() — implemented in Phase 2")
+    import torch
+    from torchvision import transforms
+
+    transform = transforms.Compose([
+        transforms.Resize(target_size, interpolation=transforms.InterpolationMode.LANCZOS),
+        transforms.ToTensor(),                          # [0,255] uint8 -> [0.0,1.0] float32, HWC->CHW
+        transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+    ])
+
+    image = load_image(image_source)
+    tensor = transform(image)          # shape: (3, H, W)
+    return tensor.unsqueeze(0)         # shape: (1, 3, H, W)

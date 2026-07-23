@@ -26,6 +26,6 @@ services:
       # - key: DATABASE_URL
       #   value: postgresql://...  (your Supabase connection string)
       # - key: MODEL_DOWNLOAD_URL
-      #   value: https://github.com/YOUR_USERNAME/NutriSnap/releases/download/v1.0/food101_v1.keras
+      #   value: https://github.com/YOUR_USERNAME/NutriSnap/releases/download/v1.0/food101_v1.pt
       # - key: MODEL_PATH
-      #   value: ml/models/food101_v1.keras
+      #   value: ml/models/food101_v1.pt

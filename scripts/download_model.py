@@ -17,13 +17,13 @@ Usage
 Where to get MODEL_DOWNLOAD_URL
 --------------------------------
 After training the model on Google Colab (see notebooks/train_food101_colab.ipynb):
-  1. Upload the .keras file to a GitHub Release:
+  1. Upload the .pt file to a GitHub Release:
      GitHub repo -> Releases -> Draft a new release -> Attach binary files
      The URL will look like:
-     https://github.com/YOUR_USERNAME/NutriSnap/releases/download/v1.0/food101_v1.keras
+     https://github.com/YOUR_USERNAME/NutriSnap/releases/download/v1.0/food101_v1.pt
 
   2. Set this URL in your .env file:
-     MODEL_DOWNLOAD_URL=https://github.com/YOUR_USERNAME/NutriSnap/releases/download/v1.0/food101_v1.keras
+     MODEL_DOWNLOAD_URL=https://github.com/YOUR_USERNAME/NutriSnap/releases/download/v1.0/food101_v1.pt
 
   3. Set the same variable in your Render environment variables.
 
@@ -54,7 +54,7 @@ if env_file.exists():
 
 def main() -> None:
     url = os.environ.get("MODEL_DOWNLOAD_URL", "").strip()
-    model_path_str = os.environ.get("MODEL_PATH", "ml/models/food101_v1.keras").strip()
+    model_path_str = os.environ.get("MODEL_PATH", "ml/models/food101_v1.pt").strip()
     model_path = PROJECT_ROOT / model_path_str
 
     if not url:
@@ -64,11 +64,11 @@ def main() -> None:
         print()
         print("  Add this to your .env file:")
         print("  MODEL_DOWNLOAD_URL=https://github.com/YOUR_USERNAME/NutriSnap/")
-        print("                     releases/download/v1.0/food101_v1.keras")
+        print("                     releases/download/v1.0/food101_v1.pt")
         print()
         print("  Steps to get the URL:")
         print("  1. Train on Google Colab using notebooks/train_food101_colab.ipynb")
-        print("  2. Download the .keras file from Colab")
+        print("  2. Download the .pt file from Colab")
         print("  3. Upload it to a GitHub Release in your NutriSnap repository")
         print("  4. Copy the download URL and set MODEL_DOWNLOAD_URL in .env")
         print()

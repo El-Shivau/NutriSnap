@@ -81,12 +81,16 @@ def register():
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
 
-        success, message = _auth_service.register(
-            username=username,
-            email=email,
-            password=password,
-            confirm_password=confirm_password,
-        )
+        try:
+            success, message = _auth_service.register(
+                username=username,
+                email=email,
+                password=password,
+                confirm_password=confirm_password,
+            )
+        except Exception as e:
+            import traceback
+            return f"INTERNAL SERVER ERROR TRACEBACK: {traceback.format_exc()}", 500
 
         if success:
             flash(

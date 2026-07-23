@@ -21,7 +21,20 @@ from backend.models.food_log import FoodLog
 logger = logging.getLogger(__name__)
 
 
-@click.command("clean-old-images")
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    """
+    Creates all database tables based on the SQLAlchemy models.
+    """
+    click.echo("Initialising database tables...")
+    import backend.models  # Ensure all models are registered
+    try:
+        db.create_all()
+        click.echo("All tables created successfully.")
+    except Exception as e:
+        logger.error(f"Failed to create tables: {e}")
+        click.echo(f"Error creating tables: {e}", err=True)
 @with_appcontext
 def clean_old_images_command():
     """
@@ -85,3 +98,4 @@ def clean_old_images_command():
 def register_cli_commands(app):
     """Register all custom CLI commands with the Flask app."""
     app.cli.add_command(clean_old_images_command)
+    app.cli.add_command(init_db_command)

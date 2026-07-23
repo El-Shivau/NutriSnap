@@ -9,8 +9,8 @@ services:
       pip install -r requirements.txt
       python scripts/download_model.py
 
-    # Start: use gunicorn to serve Flask
-    startCommand: gunicorn "backend.wsgi:app" --workers 2 --timeout 120 --bind 0.0.0.0:$PORT
+    # Start: initialize database tables, then use gunicorn to serve Flask
+    startCommand: flask --app backend.wsgi init-db && gunicorn "backend.wsgi:app" --workers 2 --timeout 120 --bind 0.0.0.0:$PORT
 
     # Health check endpoint
     healthCheckPath: /

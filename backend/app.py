@@ -132,4 +132,7 @@ def _register_user_loader() -> None:
     @login_manager.user_loader
     def load_user(user_id: str):  # type: ignore[return]
         """Load a user object by their integer ID stored in the session."""
-        return db.session.get(User, int(user_id))
+        try:
+            return db.session.get(User, int(user_id))
+        except (ValueError, TypeError):
+            return None

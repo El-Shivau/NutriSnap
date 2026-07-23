@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in-up">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-0 text-white">Dashboard</h1>
+            <p class="text-secondary small mb-0">
+                Welcome back, <span class="text-success fw-semibold">{{ current_user.username }}</span>
+            </p>
+        </div>
+        <a href="{{ url_for('food.upload') }}" class="btn btn-success" id="dashboard-upload-btn">
+            <i class="bi bi-plus-circle me-2"></i>Log Food
+        </a>
+    </div>
+
+    <!-- Today's Summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value" id="stat-calories">
+                    {% if today_summary.total_calories > 0 %}
+                        {{ today_summary.total_calories | round(0) | int }}
+                    {% else %}—{% endif %}
+                </div>
+                <div class="stat-label">Calories</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value" id="stat-protein">
+                    {% if today_summary.total_protein_g > 0 %}
+                        {{ today_summary.total_protein_g | round(1) }}g
+                    {% else %}—{% endif %}
+                </div>
+                <div class="stat-label">Protein</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value" id="stat-carbs">
+                    {% if today_summary.total_carbs_g > 0 %}
+                        {{ today_summary.total_carbs_g | round(1) }}g
+                    {% else %}—{% endif %}
+                </div>
+                <div class="stat-label">Carbs</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-value" id="stat-fat">
+                    {% if today_summary.total_fat_g > 0 %}
+                        {{ today_summary.total_fat_g | round(1) }}g
+                    {% else %}—{% endif %}
+                </div>
+                <div class="stat-label">Fat</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <a href="{{ url_for('food.upload') }}" class="text-decoration-none">
+                <div class="stat-card d-flex align-items-center gap-3 p-3">
+                    <div class="bg-success bg-opacity-20 rounded-circle p-2">
+                        <i class="bi bi-camera text-success fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold text-white small">Scan Food</div>
+                        <div class="text-secondary" style="font-size:0.75rem;">Upload a photo</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a href="{{ url_for('food.history') }}" class="text-decoration-none">
+                <div class="stat-card d-flex align-items-center gap-3 p-3">
+                    <div class="bg-success bg-opacity-20 rounded-circle p-2">
+                        <i class="bi bi-clock-history text-success fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold text-white small">Food History</div>
+                        <div class="text-secondary" style="font-size:0.75rem;">View all logs</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a href="{{ url_for('dashboard.profile') }}" class="text-decoration-none">
+                <div class="stat-card d-flex align-items-center gap-3 p-3">
+                    <div class="bg-success bg-opacity-20 rounded-circle p-2">
+                        <i class="bi bi-person text-success fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold text-white small">My Profile</div>
+                        <div class="text-secondary" style="font-size:0.75rem;">Edit settings</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Logs -->
+    <div class="food-log-table">
+        <div class="p-3 border-bottom" style="border-color: var(--ns-border);">
+            <h2 class="h6 fw-semibold text-white mb-0">
+                <i class="bi bi-clock-history me-2 text-success"></i>Today's Logs
+                {% if today_summary.log_count > 0 %}
+                <span class="badge bg-success bg-opacity-25 text-success ms-2" style="font-size:0.7rem;">
+                    {{ today_summary.log_count }} meal{% if today_summary.log_count != 1 %}s{% endif %}
+                </span>
+                {% endif %}
+            </h2>
+        </div>
+
+        {% if recent_logs %}
+        <table class="table mb-0">
+            <tbody>
+                {% for log in recent_logs %}
+                <tr>
+                    <td style="width:52px;">
+                        {% if log.image_filename %}
+                        <img src="{{ url_for('food.uploaded_file', filename=log.image_filename) }}"
+                             onerror="this.style.display='none'"
+                             alt="{{ log.display_name }}"
+                             style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+                        {% else %}
+                        <div style="width:40px;height:40px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-egg-fried text-success"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-semibold text-white small">{{ log.display_name }}</div>
+                        <div class="text-secondary" style="font-size:0.72rem;">
+                            {{ log.calories | round(0) | int }} kcal · {{ log.protein_g | round(1) }}g protein
+                        </div>
+                    </td>
+                    <td class="text-end text-secondary small align-middle">
+                        {{ log.logged_at[11:16] if log.logged_at else '' }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="p-3 text-end">
+            <a href="{{ url_for('food.history') }}" class="text-success small text-decoration-none">
+                View full history <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-secondary" id="recent-logs-placeholder">
+            <i class="bi bi-journal-x" style="font-size: 2rem; opacity: 0.4;"></i>
+            <p class="mt-2 mb-0 small">
+                No food logged today.
+                <a href="{{ url_for('food.upload') }}">Upload your first meal!</a>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

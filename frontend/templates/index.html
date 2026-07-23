@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<!-- ========================================================================
+     Hero Section
+     ======================================================================== -->
+<section class="hero-section py-5 text-center text-white">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="hero-badge mb-3">
+                    <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">
+                        <i class="bi bi-stars me-1"></i> Powered by EfficientNetB0
+                    </span>
+                </div>
+                <h1 class="display-4 fw-bold mb-4">
+                    Know What You're <span class="text-success">Eating</span>
+                    <br>Instantly.
+                </h1>
+                <p class="lead text-secondary mb-5">
+                    Snap a photo of any meal and let our self-trained AI identify the food
+                    and deliver detailed nutritional information — all in seconds.
+                </p>
+                <div class="d-flex flex-sm-row flex-column gap-3 justify-content-center">
+                    <a href="{{ url_for('auth.register') }}"
+                       class="btn btn-success btn-lg px-5"
+                       id="hero-get-started-btn">
+                        <i class="bi bi-camera-fill me-2"></i>Get Started Free
+                    </a>
+                    <a href="{{ url_for('auth.login') }}"
+                       class="btn btn-outline-light btn-lg px-5"
+                       id="hero-login-btn">
+                        Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================================
+     Feature Cards
+     ======================================================================== -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <h2 class="text-center text-white fw-bold mb-5">
+            Everything You Need to Track Your Nutrition
+        </h2>
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card feature-card h-100 text-center p-4 border-0">
+                    <div class="feature-icon mx-auto mb-3">
+                        <i class="bi bi-cpu text-success" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="h5 fw-semibold text-white">AI Recognition</h3>
+                    <p class="text-secondary small">
+                        Our EfficientNetB0 model trained on the Food-101 dataset
+                        identifies 101 different foods from a single photo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card feature-card h-100 text-center p-4 border-0">
+                    <div class="feature-icon mx-auto mb-3">
+                        <i class="bi bi-bar-chart-fill text-success" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="h5 fw-semibold text-white">Instant Nutrition</h3>
+                    <p class="text-secondary small">
+                        Get calories, protein, fat, carbohydrates, and fibre data
+                        from our curated nutrition database — no guessing needed.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card feature-card h-100 text-center p-4 border-0">
+                    <div class="feature-icon mx-auto mb-3">
+                        <i class="bi bi-journal-check text-success" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="h5 fw-semibold text-white">Food Diary</h3>
+                    <p class="text-secondary small">
+                        Log every meal effortlessly. Your personal dashboard tracks
+                        daily intake and shows your history over time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================================
+     How It Works
+     ======================================================================== -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">How It Works</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="step-number">1</div>
+                <h4 class="fw-semibold mt-3">Upload a Photo</h4>
+                <p class="text-secondary small">Take a photo of your meal and upload it to NutriSnap.</p>
+            </div>
+            <div class="col-md-3">
+                <div class="step-number">2</div>
+                <h4 class="fw-semibold mt-3">AI Analyses It</h4>
+                <p class="text-secondary small">Our model predicts the food with confidence scores.</p>
+            </div>
+            <div class="col-md-3">
+                <div class="step-number">3</div>
+                <h4 class="fw-semibold mt-3">Get Nutrition Info</h4>
+                <p class="text-secondary small">Instantly see calories, macros, and serving details.</p>
+            </div>
+            <div class="col-md-3">
+                <div class="step-number">4</div>
+                <h4 class="fw-semibold mt-3">Log & Track</h4>
+                <p class="text-secondary small">Confirm the entry to save it to your food diary.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================================
+     CTA Banner
+     ======================================================================== -->
+<section class="py-5 bg-success text-white text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Start Tracking Your Nutrition Today</h2>
+        <p class="lead mb-4 opacity-75">Join NutriSnap and make every meal count.</p>
+        <a href="{{ url_for('auth.register') }}"
+           class="btn btn-light btn-lg text-success fw-semibold px-5"
+           id="cta-register-btn">
+            Create Free Account
+        </a>
+    </div>
+</section>
+{% endblock %}

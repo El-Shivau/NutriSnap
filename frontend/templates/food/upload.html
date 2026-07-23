@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Food Image{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in-up" style="max-width: 640px;">
+    <div class="text-center mb-4">
+        <h1 class="h3 fw-bold text-white">Upload a Food Photo</h1>
+        <p class="text-secondary">Our AI will identify the food and show its nutritional info.</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('food.upload') }}"
+          enctype="multipart/form-data" id="upload-form">
+
+        <!-- Upload Zone -->
+        <div class="upload-zone mb-3" id="upload-zone" role="button"
+             aria-label="Click or drag and drop to upload a food image">
+            <!-- Image preview (hidden until a file is chosen) -->
+            <img id="image-preview" src="#" alt="Preview"
+                 style="display:none; max-height:260px; max-width:100%;
+                        border-radius:12px; object-fit:cover; margin-bottom:12px;">
+
+            <!-- Default icon + labels (hidden once preview is shown) -->
+            <div id="upload-placeholder">
+                <i class="bi bi-cloud-arrow-up-fill d-block mb-3" style="font-size:2.5rem;"></i>
+                <p class="fw-semibold text-white mb-1">Drag &amp; drop your image here</p>
+                <p class="text-secondary small mb-0" id="upload-zone-label">
+                    or click to browse (PNG, JPG, JPEG, WebP · max 16 MB)
+                </p>
+            </div>
+
+            <!-- Hidden file input — name MUST be "image" to match the controller -->
+            <input type="file" id="food-image-input" name="image"
+                   accept=".png,.jpg,.jpeg,.webp" class="d-none" required>
+        </div>
+
+        <!-- Change photo link (visible only after a file is chosen) -->
+        <p id="change-photo-hint" class="text-center text-secondary small mb-3" style="display:none;">
+            <a href="#" id="change-photo-link" class="text-success">Change photo</a>
+        </p>
+
+        <!-- Submit Button -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-success btn-lg" id="upload-submit-btn" disabled>
+                <i class="bi bi-search me-2"></i>Scan &amp; Analyse Food
+            </button>
+        </div>
+    </form>
+
+    <p class="text-center text-secondary small mt-4">
+        <i class="bi bi-info-circle me-1"></i>
+        NutriSnap recognises 101 food types from the Food-101 dataset.
+    </p>
+</div>
+
+<script>
+(function () {
+    "use strict";
+    const zone        = document.getElementById("upload-zone");
+    const fileInput   = document.getElementById("food-image-input");
+    const preview     = document.getElementById("image-preview");
+    const placeholder = document.getElementById("upload-placeholder");
+    const hint        = document.getElementById("change-photo-hint");
+    const submitBtn   = document.getElementById("upload-submit-btn");
+    const changeLink  = document.getElementById("change-photo-link");
+
+    function showPreview(file) {
+        if (!file || !file.type.startsWith("image/")) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+            placeholder.style.display = "none";
+            hint.style.display = "block";
+            submitBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Click zone → open file picker
+    zone.addEventListener("click", function (e) {
+        if (e.target === changeLink) return; // handled separately
+        fileInput.click();
+    });
+
+    // Change photo link
+    changeLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.click();
+    });
+
+    // File selected via picker
+    fileInput.addEventListener("change", function () {
+        if (fileInput.files.length > 0) showPreview(fileInput.files[0]);
+    });
+
+    // Drag & drop
+    ["dragenter", "dragover", "dragleave", "drop"].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); });
+    });
+    zone.addEventListener("dragenter", function () { zone.classList.add("drag-over"); });
+    zone.addEventListener("dragover",  function () { zone.classList.add("drag-over"); });
+    zone.addEventListener("dragleave", function () { zone.classList.remove("drag-over"); });
+    zone.addEventListener("drop", function (e) {
+        zone.classList.remove("drag-over");
+        var files = e.dataTransfer && e.dataTransfer.files;
+        if (files && files.length > 0) {
+            var dt = new DataTransfer();
+            dt.items.add(files[0]);
+            fileInput.files = dt.files;
+            showPreview(files[0]);
+        }
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+# =============================================================================
+# NutriSnap – .gitignore
+# =============================================================================
+
+# ----------------------------
+# SECRETS & ENVIRONMENT
+# ----------------------------
+.env
+.env.local
+.env.production
+*.secret
+
+# ----------------------------
+# PYTHON
+# ----------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+MANIFEST
+*.manifest
+*.spec
+
+# ----------------------------
+# VIRTUAL ENVIRONMENTS
+# ----------------------------
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# ----------------------------
+# JUPYTER
+# ----------------------------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ----------------------------
+# ML MODELS (large binary files)
+# ----------------------------
+ml/models/*.keras
+ml/models/*.h5
+ml/models/*.pb
+ml/models/*.tflite
+ml/models/*.onnx
+
+# ----------------------------
+# DATASETS (very large)
+# ----------------------------
+ml/dataset/food-101/
+ml/dataset/*.tar.gz
+ml/dataset/*.zip
+ml/dataset/*.tar
+
+# ----------------------------
+# TRAINING ARTEFACTS
+# ----------------------------
+ml/training/logs/
+ml/training/checkpoints/
+ml/evaluation/reports/
+ml/evaluation/plots/
+
+# ----------------------------
+# DATABASE FILES
+# ----------------------------
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# ----------------------------
+# FLASK
+# ----------------------------
+instance/
+.webassets-cache
+
+# ----------------------------
+# UPLOADS (user-uploaded images)
+# ----------------------------
+backend/uploads/
+frontend/static/uploads/
+
+# ----------------------------
+# TESTING & COVERAGE
+# ----------------------------
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# ----------------------------
+# LINTING & FORMATTING
+# ----------------------------
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# ----------------------------
+# IDEs & EDITORS
+# ----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# LOGS
+# ----------------------------
+logs/
+*.log
+
+# ----------------------------
+# NODE (if any frontend tooling added later)
+# ----------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+
+# ----------------------------
+# DOCUMENTATION BUILD
+# ----------------------------
+docs/_build/
+docs/site/
+*.pt

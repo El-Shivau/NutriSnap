@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Friends{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in-up">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-white mb-0">
+                <i class="bi bi-people-fill text-success me-2"></i>Friends
+            </h1>
+            <p class="text-secondary small mb-0">{{ friends | length }} friend{% if friends | length != 1 %}s{% endif %}</p>
+        </div>
+        <a href="{{ url_for('friends.search') }}" class="btn btn-success btn-sm" id="find-friends-btn">
+            <i class="bi bi-person-plus me-1"></i>Find Friends
+        </a>
+    </div>
+
+    <!-- Pending Requests Received -->
+    {% if received %}
+    <div class="mb-4">
+        <h2 class="h6 fw-semibold text-white mb-3">
+            <i class="bi bi-bell-fill text-warning me-2"></i>Pending Requests
+            <span class="badge bg-warning text-dark ms-1">{{ received | length }}</span>
+        </h2>
+        <div class="d-flex flex-column gap-2">
+            {% for item in received %}
+            <div class="prediction-card p-3 d-flex align-items-center gap-3">
+                <!-- Avatar -->
+                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-success flex-shrink-0"
+                     style="width:42px;height:42px;background:rgba(16,185,129,0.15);font-size:1rem;">
+                    {{ item.user.username[0].upper() if item.user else '?' }}
+                </div>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold text-white small">{{ item.user.username if item.user else 'Unknown' }}</div>
+                    <div class="text-secondary" style="font-size:0.75rem;">Wants to be your friend</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <form method="POST" action="{{ url_for('friends.accept_request', requester_id=item.friendship.requester_id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-check-lg"></i> Accept
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('friends.decline_request', requester_id=item.friendship.requester_id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-x-lg"></i> Decline
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Sent (Pending) Requests -->
+    {% if sent %}
+    <div class="mb-4">
+        <h2 class="h6 fw-semibold text-secondary mb-3">
+            <i class="bi bi-clock me-2"></i>Requests Sent
+        </h2>
+        <div class="d-flex flex-column gap-2">
+            {% for item in sent %}
+            <div class="prediction-card p-3 d-flex align-items-center gap-3" style="opacity:0.85;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-secondary flex-shrink-0"
+                     style="width:42px;height:42px;background:rgba(255,255,255,0.06);font-size:1rem;">
+                    {{ item.user.username[0].upper() if item.user else '?' }}
+                </div>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold text-white small">{{ item.user.username if item.user else 'Unknown' }}</div>
+                    <div class="text-secondary" style="font-size:0.75rem;">Request pending…</div>
+                </div>
+                <form method="POST" action="{{ url_for('friends.cancel_request', addressee_id=item.friendship.addressee_id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                        Cancel
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Friends List -->
+    <div>
+        <h2 class="h6 fw-semibold text-white mb-3">
+            <i class="bi bi-people me-2 text-success"></i>Your Friends
+        </h2>
+
+        {% if friends %}
+        <div class="food-log-table">
+            <table class="table mb-0">
+                <tbody>
+                    {% for friend in friends %}
+                    <tr>
+                        <td style="width:52px;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-success"
+                                 style="width:38px;height:38px;background:rgba(16,185,129,0.15);font-size:0.9rem;">
+                                {{ friend.username[0].upper() }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-white small">{{ friend.username }}</div>
+                            {% if friend.bio %}
+                            <div class="text-secondary" style="font-size:0.72rem;">{{ friend.bio[:60] }}{% if friend.bio | length > 60 %}…{% endif %}</div>
+                            {% endif %}
+                        </td>
+                        <td class="text-end align-middle">
+                            <form method="POST" action="{{ url_for('friends.unfriend', friend_id=friend.id) }}"
+                                  onsubmit="return confirm('Remove {{ friend.username }} as a friend?')">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="prediction-card p-5 text-center text-secondary">
+            <i class="bi bi-people" style="font-size:2.5rem;opacity:0.3;"></i>
+            <p class="mt-3 mb-1 small">No friends yet.</p>
+            <a href="{{ url_for('friends.search') }}" class="btn btn-success btn-sm mt-2">
+                <i class="bi bi-person-plus me-1"></i>Find Friends
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

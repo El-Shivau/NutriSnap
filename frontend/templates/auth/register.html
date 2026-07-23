@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<section class="auth-section py-5">
+    <div class="auth-card fade-in-up" style="max-width: 480px;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <i class="bi bi-person-plus-fill text-success" style="font-size: 2.5rem;"></i>
+            <h1 class="h3 fw-bold mt-2 text-white">Create Your Account</h1>
+            <p class="text-secondary small">Join NutriSnap and start tracking your nutrition</p>
+        </div>
+
+        <!-- Registration Form — fully implemented in Phase 5 -->
+        <form method="POST" action="{{ url_for('auth.register') }}" id="register-form" novalidate>
+            {# CSRF Token (Flask-WTF) — uncomment in Phase 5 when form objects are passed #}
+            {# form.hidden_tag() #}
+
+            <!-- Username -->
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username"
+                       placeholder="e.g. john_doe" required minlength="3" maxlength="30"
+                       autocomplete="username">
+                <div class="form-text text-secondary" style="font-size: 0.75rem;">
+                    3–30 characters. Letters, numbers, underscores, hyphens only.
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email"
+                       placeholder="you@example.com" required autocomplete="email">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password"
+                       placeholder="Min. 8 chars, 1 uppercase, 1 digit" required
+                       minlength="8" autocomplete="new-password">
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-4">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password"
+                       name="confirm_password" placeholder="Repeat your password"
+                       required autocomplete="new-password">
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-success w-100 py-2" id="register-submit-btn">
+                <i class="bi bi-person-check me-2"></i>Create Account
+            </button>
+        </form>
+
+        <hr class="border-secondary my-4">
+
+        <p class="text-center text-secondary small mb-0">
+            Already have an account?
+            <a href="{{ url_for('auth.login') }}" class="text-success fw-semibold"
+               id="go-to-login-link">
+                Sign in here
+            </a>
+        </p>
+    </div>
+</section>
+{% endblock %}
